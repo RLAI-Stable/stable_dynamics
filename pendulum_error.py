@@ -35,9 +35,6 @@ def main(args):
 
     cache_path = Path("pendulum-cache") / f"p-physics-{n}.npy"
 
-    # Energy functions
-    energy = pendulum_energy.pendulum_energy(n)
-
     if not cache_path.exists():
         logger.info(f"Generating trajectories for {cache_path}")
         # Initialize args.number initial positions:
