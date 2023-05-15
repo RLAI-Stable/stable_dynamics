@@ -12,6 +12,8 @@ from torchvision.utils import save_image
 from util import (DynamicLoad, latest_file, loadDataFile, setup_logging, to_variable)
 from scipy.integrate import odeint
 
+import time
+
 from models import pendulum_energy
 
 from pathlib import Path
@@ -44,7 +46,7 @@ def main(args):
         X_phy = np.zeros((args.steps, *X_init.shape), dtype=np.float32)
         X_phy[0,...] = X_init
         for i in range(1, args.steps):
-            logger.info(f"Timestep {i}")
+            logger.info(f"Generating Trajectories: Timestep {i}")
             k1 = h * physics(X_phy[i-1,...])
             X_phy[i,...] = X_phy[i-1,...] + k1
             assert not np.any(np.isnan(X_phy[i,...]))
@@ -59,24 +61,37 @@ def main(args):
     X_nn = to_variable(torch.tensor(X_phy[0,:,:]), cuda=torch.cuda.is_available())
     errors = np.zeros((args.steps,))
     for i in range(1, args.steps):
+        logger.info(f"Calculating error: Timestep {i}")
+
+        start = time.time()
         X_nn.requires_grad = True
         k1 = h * model(X_nn)
         k1 = k1.detach()
         X_nn = X_nn + k1
         X_nn = X_nn.detach()
-
-        logger.info(f"Timestep {i}")
+        print(f"{i}: Time to predict: {time.time()-start}")
+        
+        start = time.time()
         y = X_nn.cpu().numpy()
+        print(f"{i}: Time to convert to np: {time.time()-start}")
+
         # TODO: Update error calculation
+        start = time.time()
         vel_error = np.sum((X_phy[i,:,n:] - y[:,n:])**2)
         ang_error = (X_phy[i,:,:n] - y[:,:n])
+        print(f"{i}: Time to calculate error: {time.time()-start}")
+
+        start = time.time()
         while np.any(ang_error >= np.pi):
             ang_error[ang_error >= np.pi] -= 2*np.pi
         while np.any(ang_error < -np.pi):
             ang_error[ang_error < -np.pi] += 2*np.pi
+        print(f"{i}: Time to wrap error: {time.time()-start}")
 
+        start = time.time()
         ang_error = np.sum(ang_error**2)
         errors[i] = (vel_error + ang_error)
+        print(f"{i}: Time to sum error: {time.time()-start}")
 
     for i in range(args.steps):
         print(f"{i}\t{np.sum(errors[0:i])}\t{errors[i]}")
