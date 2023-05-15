@@ -82,10 +82,14 @@ def main(args):
         print(f"{i}: Time to calculate error: {time.time()-start}")
 
         start = time.time()
-        while np.any(ang_error >= np.pi):
-            ang_error[ang_error >= np.pi] -= 2*np.pi
-        while np.any(ang_error < -np.pi):
-            ang_error[ang_error < -np.pi] += 2*np.pi
+        # while np.any(ang_error >= np.pi):
+        #     ang_error[ang_error >= np.pi] -= 2*np.pi
+        # while np.any(ang_error < -np.pi):
+        #     ang_error[ang_error < -np.pi] += 2*np.pi
+        mod = ang_error//(2*np.pi)
+        ang_error -= mod*2*np.pi
+        ang_error -= np.pi
+        assert all(np.all(ang_error <= np.pi), np.all(ang_error >= -np.pi))
         print(f"{i}: Time to wrap error: {time.time()-start}")
 
         start = time.time()
