@@ -46,10 +46,7 @@ def main(args):
         for i in range(1, args.steps):
             logger.info(f"Timestep {i}")
             k1 = h * physics(X_phy[i-1,...])
-            k2 = h * physics(X_phy[i-1,...] + k1/2)
-            k3 = h * physics(X_phy[i-1,...] + k2/2)
-            k4 = h * physics(X_phy[i-1,...] + k3)
-            X_phy[i,...] = X_phy[i-1,...] + 1/6*(k1 + 2*k2 + 2*k3 + k4)
+            X_phy[i,...] = X_phy[i-1,...] + k1
             assert not np.any(np.isnan(X_phy[i,...]))
 
         np.save(cache_path, X_phy)
@@ -65,13 +62,7 @@ def main(args):
         X_nn.requires_grad = True
         k1 = h * model(X_nn)
         k1 = k1.detach()
-        k2 = h * model(X_nn + k1/2)
-        k2 = k2.detach()
-        k3 = h * model(X_nn + k2/2)
-        k3 = k3.detach()
-        k4 = h * model(X_nn + k3)
-        k4 = k4.detach()
-        X_nn = X_nn + 1/6*(k1 + 2*k2 + 2*k3 + k4)
+        X_nn = X_nn + k1
         X_nn = X_nn.detach()
 
         logger.info(f"Timestep {i}")
