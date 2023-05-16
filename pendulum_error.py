@@ -61,7 +61,8 @@ def main(args):
     X_nn = to_variable(torch.tensor(X_phy[0,:,:]), cuda=torch.cuda.is_available())
     errors = np.zeros((args.steps,))
     for i in range(1, args.steps):
-        logger.info(f"Calculating error: Timestep {i}")
+        if not i % 50:
+            logger.info(f"Calculating error: Timestep {i}")
 
         start = time.time()
         X_nn.requires_grad = True
@@ -69,17 +70,17 @@ def main(args):
         k1 = k1.detach()
         X_nn = X_nn + k1
         X_nn = X_nn.detach()
-        print(f"{i}: Time to predict: {time.time()-start}")
+        # print(f"{i}: Time to predict: {time.time()-start}")
         
         start = time.time()
         y = X_nn.cpu().numpy()
-        print(f"{i}: Time to convert to np: {time.time()-start}")
+        # print(f"{i}: Time to convert to np: {time.time()-start}")
 
         # TODO: Update error calculation
         start = time.time()
         vel_error = np.sum((X_phy[i,:,n:] - y[:,n:])**2)
         ang_error = (X_phy[i,:,:n] - y[:,:n]).astype('float64')
-        print(f"{i}: Time to calculate error: {time.time()-start}")
+        # print(f"{i}: Time to calculate error: {time.time()-start}")
 
         start = time.time()
         # Scales errors to the range [0, 2pi)
@@ -90,12 +91,12 @@ def main(args):
         if np.any(ang_error > np.pi):
             ang_error[ang_error > np.pi] -= 2*np.pi
         assert all([np.all(ang_error <= np.pi), np.all(ang_error >= -np.pi)]), f"Angles not in range: {ang_error[ang_error > np.pi], ang_error[ang_error < -np.pi]}"
-        print(f"{i}: Time to wrap error: {time.time()-start}")
+        # print(f"{i}: Time to wrap error: {time.time()-start}")
 
         start = time.time()
         ang_error = np.sum(ang_error**2)
         errors[i] = (vel_error + ang_error)
-        print(f"{i}: Time to sum error: {time.time()-start}")
+        # print(f"{i}: Time to sum error: {time.time()-start}")
 
     for i in range(args.steps):
         print(f"{i}\t{np.sum(errors[0:i])}\t{errors[i]}")
