@@ -155,7 +155,7 @@ def loss(Ypred, Yactual, X):
 
         Vloss = (V(succ_X) - V(X)).clamp(min=0).mean()
 
-    l2loss = ((Ypred - Yactual)**2).mean()
+    l2loss = ((Ypred + X - Yactual)**2).mean()
 
     return (l2loss + SMOOTH_V * Vloss, l2loss, Vloss)
 
