@@ -155,7 +155,7 @@ def loss(Ypred, Yactual, X):
 
         Vloss = (V(succ_X) - V(X)).clamp(min=0).mean()
 
-    l2loss = ((Ypred + X - Yactual)**2).mean()
+    l2loss = ((next_state_prediction(X, Ypred) - Yactual)**2).mean()
 
     return (l2loss + SMOOTH_V * Vloss, l2loss, Vloss)
 
@@ -168,6 +168,13 @@ def loss_flatten(l):
 
 def loss_labels():
     return ["loss", "l2", "V"]
+
+def next_state_prediction(X, Ypred):
+    """
+    X: original state
+    Ypred: network prediction [we currently want it to be the gradient]
+    """
+    return X + Ypred
 
 def summary(*a, **kw):
     pass
