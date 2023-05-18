@@ -14,8 +14,6 @@ from scipy.integrate import odeint
 
 import time
 
-from models import pendulum_energy
-
 from pathlib import Path
 
 logger = setup_logging(os.path.basename(__file__))
