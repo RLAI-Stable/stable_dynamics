@@ -103,6 +103,7 @@ def main(args):
                 writer.add_scalar(f'test_loss/{lbl}', val, epoch)
 
     # Ensure the writer is completed.
+    writer.flush()
     writer.close()
 
 if __name__ == "__main__":
