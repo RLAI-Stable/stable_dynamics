@@ -66,7 +66,9 @@ def main(args):
         errors[i] = compute_error_at_timestep(X_phy, y, i, n)
 
     for i in range(args.steps):
-        print(f"Step:\t{i}\tCumulative_error:\t{np.sum(errors[0:i])}\tCurrent:\t{errors[i]}")
+        logger.info(f"Step{i} Cumulative_error: {np.sum(errors[0:i])} Current: {errors[i]}")
+    print("{};{};{}".format(i, np.mean(errors[0:]), errors[-1]), end="")
+
 
 def compute_error_at_timestep(X_phy, y, i, n):
     vel_error = np.sum((X_phy[i,:,n:] - y[:,n:])**2)
