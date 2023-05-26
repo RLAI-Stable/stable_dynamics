@@ -67,7 +67,27 @@ def main(args):
 
     for i in range(args.steps):
         logger.info(f"Step{i} Cumulative_error: {np.sum(errors[0:i])} Current: {errors[i]}")
-    print("{};{};{}".format(i, np.mean(errors[0:]), errors[-1]), end="")
+
+    import os
+    filename = "experiments/errors/pendulum-error.npz"
+    i = 0
+    while os.path.exists(filename):
+        i += 1
+        filename = f"experiments/errors/pendulum-error-{i}.npz"
+    np.savez(filename, errors=errors)
+
+    print("{},{},{}".format(i, np.mean(errors[0:]), errors[-1]), end="")
+
+    generatePlot(filename[:-4], errors, n)
+
+
+def generatePlot(filename, errors, n):
+    import matplotlib.pyplot as plt
+    import matplotlib
+    matplotlib.use('Agg')
+    plt.plot(errors)
+    plt.title(f"Error per timestep ({n}-link pendulum)")
+    plt.savefig(filename + ".png")
 
 
 def compute_error_at_timestep(X_phy, y, i, n):
