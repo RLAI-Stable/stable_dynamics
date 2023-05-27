@@ -2,13 +2,16 @@
 set -e
 
 N="$1"
+FILENAME="$2"
 
 # Latent space dim:
 LSD=$(( 2 * N ))
 
+RESULTSDIR="experiments/evaluation_error_simple"
 OUTDIR="experiments/pendulum-simple/${N}"
 MODEL="simple[a=$LSD,b=116]"
 
+mkdir -p "$RESULTSDIR"
 mkdir -p "$OUTDIR"
 echo $MODEL > "$OUTDIR/model"
 
@@ -26,5 +29,6 @@ date >> "$OUTDIR/progress.txt"
 ./.colorize ./pendulum_error.py             \
     pendulum[n=$N,test]                     \
     "$MODEL"                                \
-    "$OUTDIR/checkpoint_*.pth"    \
-    1000 | tee -a "$OUTDIR/eval.txt"
+    "$OUTDIR/checkpoint_*.pth"              \
+    1000                                    \
+    "$RESULTSDIR/$FILENAME" | tee -a "$OUTDIR/eval.txt"
