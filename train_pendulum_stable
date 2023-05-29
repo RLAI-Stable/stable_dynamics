@@ -8,11 +8,13 @@ INNER="$4"
 INNER_EPSILON="$5"
 SMOOTH_V="$6"
 REHU="$7"
+RUN="$8"
 
 # Latent space dim:
 LSD=$(( 2 * N ))
 
-CSV_FILE="experiments/evaluation_error_${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}.csv"
+#CSV_FILE="experiments/evaluation_error_${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}.csv"
+CSV_FILE="experiments/evaluation_error_${EXP_ID}.csv"
 OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
 MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=60,h=100,rehu=$REHU]"
 
@@ -33,7 +35,7 @@ date >> "$OUTDIR/progress.txt"
 
 # Create CSV file with header if it does not exist
 if ! [ -f "$CSV_FILE" ]; then
-    echo "last_step,mean_error,last_error,model,n-links,alpha,inner,inner_epsilon,smooth_v,rehu" >> $CSV_FILE
+    echo "last_step,mean_error,last_error,model,n-links,alpha,inner,inner_epsilon,smooth_v,rehu,run" >> $CSV_FILE
 fi
 
 {
@@ -42,5 +44,5 @@ fi
     "$MODEL"                                \
     "$OUTDIR/checkpoint_*.pth"              \
     1000                                 && \
-    printf $",pendulum-${EXP_ID},${N}${ALPHA},${INNER},${INNER_EPSILON},${SMOOTH_V},${REHU}\n",                                   
+    printf $",pendulum-${EXP_ID},${N},${ALPHA},${INNER},${INNER_EPSILON},${SMOOTH_V},${REHU},${RUN}\n",                                   
 } >> "$CSV_FILE"
