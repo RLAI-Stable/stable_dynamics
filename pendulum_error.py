@@ -90,9 +90,8 @@ def main(args):
 
         errors[i] = (vel_error + ang_error)
 
-    filename = genFilename(args)
-    np.save(filename+".npy", errors)
-    generateplot(args, filename, errors)
+    filename = genFilename()
+    np.save(filename, errors)
 
     # for i in range(args.steps):
     #     print(f"{i}\t{np.sum(errors[0:i])}\t{errors[i]}"
@@ -115,20 +114,17 @@ def scaleAngErr(ang_error):
     return ang_error
 
 
-def genFilename(args):
-    from os.path import exists as path_exists
+def genFilename():
+    tmp_path = "experiments/tmp"
 
-    if args.output.endswith("/") or args.output.endswith("\\") or args.output == "":
-        default_fname = fname = f"pendulum-error-{args.data._n}"
-
-        i = 0
-        while path_exists(args.output+fname+".npy") or path_exists(args.output+fname+".png"):
-            i += 1
-            fname = default_fname + f"-({i})"
-
-        return args.output + fname
-    return args.output
-
+    i = 0
+    filename = f"{tmp_path}/{i}"
+    while os.path.exists(filename+".npy"):
+        i += 1
+        filename = f"{tmp_path}/{i}"
+    
+    print("filename generated:", filename)
+    return filename
 
 
 def generateplot(args, filename, errors):
@@ -152,6 +148,5 @@ if __name__ == "__main__":
     parser.add_argument('model', type=DynamicLoad("models"), help='model to load')
     parser.add_argument('weight', type=latest_file, help='model weight to load')
     parser.add_argument('steps', type=int, help="number of steps to evaluate over")
-    parser.add_argument('output', type=str, help="output file to save to")
 
     main(parser.parse_args())
