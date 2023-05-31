@@ -1,5 +1,23 @@
 #!/bin/bash
 
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <num_links> <num_runs>"
+    exit 1
+fi
+
+N_LINKS="$1"
+N_RUNS="$2"
+EXP_ID="stable"
+DIRECTORY="experiments/error-${EXP_ID}"
+INNER="NN-REHU"
+
+mkdir -p "$DIRECTORY"
+
+# Clear tmp directory
+rm -rf experiments/tmp
+mkdir experiments/tmp
+
+
 for ALPHA in 0.001 0.0001
 do
 for INNER_EPSILON in 0.01 0.005 0.001
@@ -8,9 +26,17 @@ for SMOOTH_V in 0
 do
 for REHU in 0.005 0.001 0.0005
 do
-./train_pendulum_stable stable "$1" "$ALPHA" NN-REHU "$INNER_EPSILON" "$SMOOTH_V" "$REHU" &
+
+for n in $(seq 1 $N_RUNS)
+do
+./train_pendulum_stable "$EXP_ID" "$N_LINKS" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" &
+wait
+done
+python generatePlots.py "experiments/error_${EXP_ID}/${N_LINKS}/${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
+
 done
 wait
 done
 done
 done
+

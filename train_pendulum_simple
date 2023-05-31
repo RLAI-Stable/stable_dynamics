@@ -3,6 +3,10 @@ set -e
 
 N="$1"
 FILENAME="$2"
+if [FILENAME == ""]
+then
+    FILENAME="simple_${N}"
+fi
 
 # Latent space dim:
 LSD=$(( 2 * N ))
