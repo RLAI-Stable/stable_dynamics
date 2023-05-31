@@ -6,7 +6,7 @@ N="$1"
 # Latent space dim:
 LSD=$(( 2 * N ))
 
-CSV_FILE="experiments/evaluation_error_simple/${N}.csv"
+CSV_FILE="experiments/evaluation_error_simple.csv"
 OUTDIR="experiments/pendulum-simple/${N}"
 MODEL="simple[a=$LSD,b=116]"
 
@@ -27,7 +27,7 @@ date >> "$OUTDIR/progress.txt"
 
 # Create CSV file with header if it does not exist
 if ! [ -f "$CSV_FILE" ]; then
-    echo ",last_step,mean_error,last_error,model,n-links" >> $CSV_FILE
+    echo "run,mean_error,last_error,model,n-links" >> $CSV_FILE
 fi
 
 {

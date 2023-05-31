@@ -7,6 +7,7 @@ PENDULUM_CACHE="pendulum-cache"
 
 for RUN in $(seq 1 $NUMBER_RUNS)
 do
+rm -rf "$PENDULUM_CACHE"  && mkdir -p "$PENDULUM_CACHE" && ./train_pendulum_simple "$N"
 for ALPHA in 0.001 0.0001
 do
 for INNER_EPSILON in 0.01 0.005 0.001
@@ -15,8 +16,6 @@ for SMOOTH_V in 0
 do
 for REHU in 0.005 0.001 0.0005
 do
-rm -rf "$PENDULUM_CACHE" 
-mkdir -p "$PENDULUM_CACHE"
 ./train_pendulum_stable stable "$N" "$ALPHA" PSD-REHU "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$RUN"  &
 done
 wait
