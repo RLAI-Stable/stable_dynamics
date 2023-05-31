@@ -91,7 +91,8 @@ def main(args):
             optimizer.step()
 
         epoch_loss = sum(loss_parts) / len(dataset)
-        print_update(args, "TRAIN", epoch, epoch_loss)
+        if epoch % 50 == 0:
+            print_update(args, "TRAIN", epoch, epoch_loss)
         for lbl, val in zip(args.model.loss_labels(), epoch_loss):
             writer.add_scalar(f'train_loss/{lbl}', val, epoch)
 

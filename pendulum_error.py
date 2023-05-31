@@ -52,7 +52,7 @@ def main(args):
     X_nn = to_variable(torch.tensor(X_phy[0,:,:]), cuda=torch.cuda.is_available())
     errors = np.zeros((args.steps,))
     for i in range(1, args.steps):
-        if not i % 50:
+        if i % 50 == 0:
             logger.info(f"Calculating error: Timestep {i}")
 
         X_nn.requires_grad = True
@@ -66,7 +66,8 @@ def main(args):
         errors[i] = compute_error_at_timestep(X_phy, y, i, n)
 
     for i in range(args.steps):
-        logger.info(f"Step{i} Cumulative_error: {np.sum(errors[0:i])} Current: {errors[i]}")
+        if i % 50 == 0:
+            logger.info(f"Step{i} Cumulative_error: {np.sum(errors[0:i])} Current: {errors[i]}")
 
     import os
     filename = "experiments/errors/pendulum-error.npz"
