@@ -27,13 +27,12 @@ def main():
         i += 1
     errors = np.mean(data, axis=0).reshape((-1, 1))
     print("data shape:", data.shape)
-    print("errors shape:", errors.shape)
 
 
     plt.plot(range(len(errors)), errors)
     plt.xlabel("Timestep")
     plt.ylabel("Error")
-    plt.title(f"Error for {filename}")
+    plt.title(f"Error for {filename} ({data.shape[0]} runs)")
     plt.savefig(filename+".png")
     plt.close()
 
