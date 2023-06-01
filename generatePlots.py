@@ -32,7 +32,7 @@ def main():
     plt.plot(range(len(errors)), errors)
     plt.xlabel("Timestep")
     plt.ylabel("Error")
-    plt.title(f"Error for {filename} ({data.shape[0]} runs)")
+    plt.title(f"Error for {filename.split('/')[-2]} ({data.shape[0]} runs)")
     plt.savefig(filename+".png")
     plt.close()
 
