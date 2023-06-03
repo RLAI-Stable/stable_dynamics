@@ -27,24 +27,8 @@ def main(args):
     logger.info(f"Loaded physics simulator for {n}-link pendulum")
 
     cache_path = Path("pendulum-cache") / f"p-physics-{n}.npy"
-
     if not cache_path.exists():
-        logger.info(f"Generating trajectories for {cache_path}")
-        # Initialize args.number initial positions:
-        X_init = np.zeros((args.number, 2 * n)).astype(np.float32)
-        X_init[:,:] = (np.random.rand(args.number, 2*n).astype(np.float32) - 0.5) * np.pi/4 # Pick values in range [-pi/8, pi/8] radians, radians/sec
-
-        X_phy = np.zeros((args.steps, *X_init.shape), dtype=np.float32)
-        X_phy[0,...] = X_init
-        for i in range(1, args.steps):
-            logger.info(f"Generating Trajectories: Timestep {i}")
-            k1 = h * physics(X_phy[i-1,...])
-            X_phy[i,...] = X_phy[i-1,...] + k1
-            assert not np.any(np.isnan(X_phy[i,...]))
-
-        np.save(cache_path, X_phy)
-        logger.info(f"Done generating trajectories for {cache_path}")
-
+        X_phy = generate_trajectories(cache_path, n, args.number, args.steps, physics, h)
     else:
         X_phy = np.load(cache_path).astype(np.float32)
         logger.info(f"Loaded trajectories from {cache_path}")
@@ -56,9 +40,7 @@ def main(args):
             logger.info(f"Calculating error: Timestep {i}")
 
         X_nn.requires_grad = True
-        k1 = h * model(X_nn)
-        k1 = k1.detach()
-        X_nn = X_nn + k1
+        X_nn = trajectory_step(X_nn , model, h)
         X_nn = X_nn.detach()
         
         y = X_nn.cpu().numpy()
@@ -105,8 +87,37 @@ def compute_error_at_timestep(X_phy, y, i, n):
     assert all([np.all(ang_error <= np.pi), np.all(ang_error >= -np.pi)]), f"Angles not in range: {ang_error[ang_error > np.pi], ang_error[ang_error < -np.pi]}"
 
     ang_error = np.sum(ang_error**2)
-
     return vel_error + ang_error
+
+
+def generate_trajectories(cache_path, n, number, steps, physics, h):
+        logger.info(f"Generating trajectories for {cache_path}")
+        # Initialize args.number initial positions:
+        X_init = np.zeros((number, 2 * n)).astype(np.float32)
+        X_init[:,:] = (np.random.rand(number, 2*n).astype(np.float32) - 0.5) * np.pi/4 # Pick values in range [-pi/8, pi/8] radians, radians/sec
+
+        X_phy = np.zeros((steps, *X_init.shape), dtype=np.float32)
+        X_phy[0,...] = X_init
+        for i in range(1, steps):
+            logger.info(f"Generating Trajectories: Timestep {i}")
+            X_phy[i,...] = trajectory_step(X_phy[i-1,...], physics, h)
+            assert not np.any(np.isnan(X_phy[i,...]))
+
+        np.save(cache_path, X_phy)
+        logger.info(f"Done generating trajectories for {cache_path}")
+        return X_phy
+
+
+def trajectory_step(X, gradient, h):
+    # Applies RK4 to generate X_t+1 from X_t
+    # https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods
+    k1 = h * gradient(X)
+    k2 = h * gradient(X + k1/2)
+    k3 = h * gradient(X + k2/2)
+    k4 = h * gradient(X + k3)
+    rk4 = X + 1/6*(k1 + 2*k2 + 2*k3 + k4)
+    return rk4 
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Error of .')
