@@ -35,7 +35,7 @@ date >> "$OUTDIR/progress.txt"
 
 # Create CSV file with header if it does not exist
 if ! [ -f "$CSV_FILE" ]; then
-    echo "last_step,mean_error,last_error,model,n-links,alpha,inner,inner_epsilon,smooth_v,rehu,run" >> $CSV_FILE
+    echo "run,mean_error,last_error,model,n-links,alpha,inner,inner_epsilon,smooth_v,rehu" >> $CSV_FILE
 fi
 
 {
@@ -44,5 +44,5 @@ fi
     "$MODEL"                                \
     "$OUTDIR/checkpoint_*.pth"              \
     1000                                 && \
-    printf $",pendulum-${EXP_ID},${N},${ALPHA},${INNER},${INNER_EPSILON},${SMOOTH_V},${REHU},${RUN}\n",                                   
+    printf $",pendulum-${EXP_ID},${N},${ALPHA},${INNER},${INNER_EPSILON},${SMOOTH_V},${REHU}}\n"                                
 } >> "$CSV_FILE"

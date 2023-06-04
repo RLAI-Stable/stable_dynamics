@@ -7,7 +7,6 @@ PENDULUM_CACHE="pendulum-cache"
 
 for RUN in $(seq 1 $NUMBER_RUNS)
 do
-rm -rf "$PENDULUM_CACHE"  && mkdir -p "$PENDULUM_CACHE" && ./train_pendulum_simple "$N"
 for ALPHA in 0.001 0.0001
 do
 for INNER_EPSILON in 0.01 0.005 0.001
