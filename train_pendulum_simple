@@ -2,10 +2,9 @@
 set -e
 
 N="$1"
-FILENAME="$2"
-if [FILENAME == ""]
-then
-    FILENAME="simple_${N}"
+SAVE="$2"
+if SAVE=1; then
+    mkdir -p experiments/tmp
 fi
 
 # Latent space dim:
@@ -35,4 +34,4 @@ date >> "$OUTDIR/progress.txt"
     "$MODEL"                                \
     "$OUTDIR/checkpoint_*.pth"              \
     1000                                    \
-    "$RESULTSDIR/$FILENAME" | tee -a "$OUTDIR/eval.txt"
+    "$SAVE" | tee -a "$OUTDIR/eval.txt"

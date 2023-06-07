@@ -40,7 +40,7 @@ do
 # Run N_JOBS jobs in parallel
 for n in $(seq 1 $N_JOBS) 
 do
-./train_pendulum_stable "$EXP_ID" "$N_LINKS" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" &
+./train_pendulum_stable "$EXP_ID" "$N_LINKS" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "1"&
 NUM_RAN=$((NUM_RAN+1))
 done
 echo waiting after $NUM_RAN

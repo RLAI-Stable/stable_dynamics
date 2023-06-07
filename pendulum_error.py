@@ -20,6 +20,9 @@ logger = setup_logging(os.path.basename(__file__))
 
 
 def main(args):
+    print(args.save, type(args.save))
+    input()
+    args.save = (args.save == 1)
     model = args.model.model
     model.load_state_dict(torch.load(args.weight))
     model.eval()
@@ -62,8 +65,10 @@ def main(args):
         X_phy = np.load(cache_path).astype(np.float32)
         logger.info(f"Loaded trajectories from {cache_path}")
 
-    X_nn = to_variable(torch.tensor(X_phy[0,:,:]), cuda=torch.cuda.is_available())
-    errors = np.zeros((args.steps,))
+    X_nn = to_variable(torch.tensor(X_phy[0,:,:]), cuda=torch.cuda.is_available()) # Initial position
+    errors = np.zeros((args.steps,)) # Error for each timestep
+    if args.save:
+        X_pred = np.zeros((args.steps, *X_nn.shape)) # Predicted trajectory (to save)
     for i in range(1, args.steps):
         logger.info(f"Timestep {i}")
 
@@ -81,6 +86,10 @@ def main(args):
         X_nn = X_nn.detach()
         y = X_nn.cpu().numpy()
 
+        # Save pred to X_pred
+        if args.save:
+            X_pred[i,...] = y
+
         # TODO: Update error calculation
         vel_error = np.sum((X_phy[i,:,n:] - y[:,n:])**2)
         ang_error = (X_phy[i,:,:n] - y[:,:n]).astype('float64')
@@ -90,8 +99,11 @@ def main(args):
 
         errors[i] = (vel_error + ang_error)
 
-    filename = genFilename()
-    np.save(filename, errors)
+    if args.save:
+        filename = genFilename()
+        np.save(filename, errors)
+        np.save(filename+"-X_pred", X_pred)
+
 
     # for i in range(args.steps):
     #     print(f"{i}\t{np.sum(errors[0:i])}\t{errors[i]}"
@@ -148,5 +160,6 @@ if __name__ == "__main__":
     parser.add_argument('model', type=DynamicLoad("models"), help='model to load')
     parser.add_argument('weight', type=latest_file, help='model weight to load')
     parser.add_argument('steps', type=int, help="number of steps to evaluate over")
+    parser.add_argument('save', type=int, help="1 to save the prediciton and error to /tmp, 0 if not")
 
     main(parser.parse_args())
