@@ -20,8 +20,6 @@ logger = setup_logging(os.path.basename(__file__))
 
 
 def main(args):
-    print(args.save, type(args.save))
-    input()
     args.save = (args.save == 1)
     model = args.model.model
     model.load_state_dict(torch.load(args.weight))
@@ -100,9 +98,9 @@ def main(args):
         errors[i] = (vel_error + ang_error)
 
     if args.save:
-        filename = genFilename()
+        pred_fname, filename = genFilename()
         np.save(filename, errors)
-        np.save(filename+"-X_pred", X_pred)
+        np.save(pred_fname, X_pred)
 
 
     # for i in range(args.steps):
@@ -128,15 +126,21 @@ def scaleAngErr(ang_error):
 
 def genFilename():
     tmp_path = "experiments/tmp"
+    preds_path = "experiments/preds"
+    if not os.path.exists(tmp_path):
+        os.makedirs(tmp_path)
+    if not os.path.exists(preds_path):
+        os.makedirs(preds_path)
 
     i = 0
     filename = f"{tmp_path}/{i}"
     while os.path.exists(filename+".npy"):
         i += 1
         filename = f"{tmp_path}/{i}"
-    
+    pred_fname = f"{preds_path}/{i}"
+
     print("filename generated:", filename)
-    return filename
+    return pred_fname, filename
 
 
 def generateplot(args, filename, errors):

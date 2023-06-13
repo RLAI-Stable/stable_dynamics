@@ -21,12 +21,30 @@ def main():
     # Concatenate all the data
     i = 1
     while os.path.exists(f"experiments/tmp/{i}.npy"):
-        temp = np.load(f"experiments/tmp/{i}.npy")
+        temp = np.load(f"experiments/tmp/{i}.npy").reshape((1, -1))
         print("temp shape:", temp.shape)
         data = np.vstack((data, temp))
         i += 1
     errors = np.mean(data, axis=0).reshape((-1, 1))
     print("data shape:", data.shape)
+
+
+    # Load predicitons if they exist
+    if os.path.exists(f"experiments/preds/0.npy"):
+        X_pred = np.load(f"experiments/preds/0.npy")
+        if X_pred.shape[0] != 1:
+            X_pred = X_pred.reshape((1, *X_pred.shape))
+        i = 1
+        while os.path.exists(f"experiments/preds/{i}.npy"):
+            temp = np.load(f"experiments/preds/{i}.npy")
+            if temp.shape[0] != 1:
+                temp = temp.reshape((1, *temp.shape))
+            X_pred = np.vstack((X_pred, temp))
+            i += 1
+        print("X_pred shape:", X_pred.shape)
+        np.save(filename+"_preds.npy", X_pred)
+    else:
+        print("No predictions found")
 
 
     plt.plot(range(len(errors)), errors)
@@ -38,7 +56,7 @@ def main():
 
 
     np.save(filename+".npy", data)
-
+    np.save(filename+"-pred.npy", X_pred)
     # clear the temporary folder
     shutil.rmtree("experiments/tmp")
 

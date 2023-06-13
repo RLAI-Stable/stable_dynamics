@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+
+# Usage ./train_many.sh <num_links> <num_runs>
+
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <num_links> <num_runs>"
     exit 1
@@ -9,7 +13,7 @@ N_LINKS="$1"
 N_RUNS="$2"
 EXP_ID="stable"
 DIRECTORY="experiments/error_${EXP_ID}"
-INNER="NN-REHU"
+INNER="PSD-REHU"
 
 mkdir -p "$DIRECTORY"
 # Clear tmp directory
@@ -17,18 +21,13 @@ rm -rf experiments/tmp
 
 N_JOBS=2
 
-# for ALPHA in 0.001 0.0001
-# do
-# for INNER_EPSILON in 0.01 0.005 0.001
-# do
-
-for ALPHA in 0.001
+for ALPHA in 0.001 #0.0001
 do
-for INNER_EPSILON in 0.001
+for INNER_EPSILON in 0.01 #0.005 0.001
 do
 for SMOOTH_V in 0
 do
-for REHU in 0.005 0.001 0.0005
+for REHU in 0.005 #0.001 0.0005
 do
 
 mkdir experiments/tmp
