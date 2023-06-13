@@ -59,6 +59,7 @@ def main():
     np.save(filename+"-pred.npy", X_pred)
     # clear the temporary folder
     shutil.rmtree("experiments/tmp")
+    shutil.rmtree("experiments/preds")
 
 
 def genFilename(folder):
