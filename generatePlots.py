@@ -42,7 +42,7 @@ def main():
             X_pred = np.vstack((X_pred, temp))
             i += 1
         print("X_pred shape:", X_pred.shape)
-        np.save(filename+"_preds.npy", X_pred)
+        np.save(filename+"_pred.npy", X_pred)
     else:
         print("No predictions found")
 
@@ -56,7 +56,6 @@ def main():
 
 
     np.save(filename+".npy", data)
-    np.save(filename+"-pred.npy", X_pred)
     # clear the temporary folder
     shutil.rmtree("experiments/tmp")
     shutil.rmtree("experiments/preds")
