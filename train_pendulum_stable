@@ -28,7 +28,7 @@ date >> "$OUTDIR/progress.txt"
     --batch-size 2000                       \
     --learning-rate "0.001"                 \
     --epochs 1000                           \
-    --test-with "pendulum[n=$N,test]"       \
+    --test-with "pendulum[n=$N,test]"       \s
     "pendulum[n=$N]"                        \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
@@ -44,5 +44,5 @@ fi
     "$MODEL"                                \
     "$OUTDIR/checkpoint_*.pth"              \
     1000                                 && \
-    printf $",pendulum-${EXP_ID},${N},${ALPHA},${INNER},${INNER_EPSILON},${SMOOTH_V},${REHU}}\n"                                
+    printf $",pendulum-${EXP_ID},${N},${ALPHA},${INNER},${INNER_EPSILON},${SMOOTH_V},${REHU}\n"                                
 } >> "$CSV_FILE"
