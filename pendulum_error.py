@@ -21,6 +21,8 @@ logger = setup_logging(os.path.basename(__file__))
 
 def main(args):
     args.save = (args.save == 1)
+    high_energy = (args.energy == 1)
+
     model = args.model.model
     model.load_state_dict(torch.load(args.weight))
     model.eval()
@@ -39,6 +41,7 @@ def main(args):
     # Energy functions
     energy = pendulum_energy.pendulum_energy(n)
 
+    np.random.seed(args.seed)
     if not cache_path.exists():
         logger.info(f"Generating trajectories for {cache_path}")
         # Initialize args.number initial positions:
@@ -148,8 +151,11 @@ def generateplot(args, filename, errors):
     plt.plot(range(args.steps), errors)
     plt.xlabel("Timestep")
     plt.ylabel("Error")
-    plt.title(f"Error for {args.model.__name__} ({args.data._n}-links)")
-    plt.savefig(filename+".png")
+    if args.energy:
+        plt.title(f"Error for {args.model.__name__} ({args.data._n}-links) - high energy")
+    else:
+        plt.title(f"Error for {args.model.__name__} ({args.data._n}-links) - low energy")
+    plt.savefig(filename + ".png")
     plt.close()
 
 
@@ -164,6 +170,9 @@ if __name__ == "__main__":
     parser.add_argument('model', type=DynamicLoad("models"), help='model to load')
     parser.add_argument('weight', type=latest_file, help='model weight to load')
     parser.add_argument('steps', type=int, help="number of steps to evaluate over")
+
     parser.add_argument('save', type=int, help="1 to save the prediciton and error to /tmp, 0 if not")
+    parser.add_argument('energy', type=int, help="1 for high energy, 0 if low (affects the initial positions)")
+    parser.add_argument('seed', type=int, help="seed for the random generator")
 
     main(parser.parse_args())

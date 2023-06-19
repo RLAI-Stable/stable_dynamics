@@ -13,6 +13,9 @@ if SAVE=1; then
     mkdir -p experiments/tmp
 fi
 
+HIGH_ENERGY=1
+SEED=1906
+
 # Latent space dim:
 LSD=$(( 2 * N ))
 
@@ -29,4 +32,6 @@ echo $MODEL > "$OUTDIR/model"
     "$MODEL"                                \
     "$OUTDIR/checkpoint_*.pth"              \
     1000                                    \
-    "$SAVE" | tee -a "$OUTDIR/eval.txt"
+    "$SAVE"                                 \
+    "$HIGH_ENERGY"                          \
+    "$SEED"    | tee -a "$OUTDIR/eval.txt"
