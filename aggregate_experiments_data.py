@@ -3,7 +3,7 @@ import csv
 import numpy as np
 import os
 
-HEADERS = ["alpha", "inner_epsilon", "rehu", "mean_error", "n_links"]
+HEADERS = ["alpha", "inner_epsilon", "rehu", "mean_error", "n_links", "run"]
 RESULTS_DIRECTORY = "experiments/results/error_stable/"
 CSV_RESULTS_FILE = RESULTS_DIRECTORY + "run_results.csv"
 
@@ -30,25 +30,22 @@ def aggregate_runs_data(data_directory, results_path):
     with open(CSV_RESULTS_FILE, "a", newline="") as run_results_file:
         run_results_writer = csv.writer(run_results_file)
         if not csv_exists:
-            headers = ["alpha", "inner_epsilon", "rehu", "mean_error", "n_links"]
-            run_results_writer.writerow(headers)
+            run_results_writer.writerow(HEADERS)
 
         for model_folder in model_folders:
             alpha, inner_epsilon, rehu = parse_hyperparameters(model_folder)
 
             errors = load_error_file(model_folder)
             mean_errors = np.mean(errors, axis=1)
-            # average_of_averages = np.mean(averages) TODO: this might be useful in the future
 
             # Write a row with the mean_error for each run
-            for mean_error in mean_errors:
-                run_results_writer.writerow([alpha, inner_epsilon, rehu, mean_error, N_LINKS])
+            for run_idx, mean_error in enumerate(mean_errors):
+                run_results_writer.writerow([alpha, inner_epsilon, rehu, mean_error, N_LINKS, run_idx])
 
 
 def main(N_LINKS):
     data_directory = f"experiments/error_stable/{N_LINKS}/"
     os.makedirs(RESULTS_DIRECTORY, exist_ok=True)
-
     aggregate_runs_data(data_directory, CSV_RESULTS_FILE)
 
 

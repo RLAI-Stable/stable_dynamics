@@ -48,7 +48,7 @@ do
                 wait
 
 
-                python generatePlots.py "experiments/error_${EXP_ID}/${N_LINKS}/${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
+                python3 generatePlots.py "experiments/error_${EXP_ID}/${N_LINKS}/${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
 
             done
         wait
