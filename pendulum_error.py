@@ -152,9 +152,9 @@ def generateplot(args, filename, errors):
     plt.xlabel("Timestep")
     plt.ylabel("Error")
     if args.energy:
-        plt.title(f"Error for {args.model.__name__} ({args.data._n}-links) - high energy")
+        plt.title(f"Error for {args.model.__name__} ({args.data._n}-links) - high energy (our code)")
     else:
-        plt.title(f"Error for {args.model.__name__} ({args.data._n}-links) - low energy")
+        plt.title(f"Error for {args.model.__name__} ({args.data._n}-links) - low energy (our code)")
     plt.savefig(filename + ".png")
     plt.close()
 

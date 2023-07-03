@@ -95,18 +95,22 @@ def pendulum_gradient(n, lengths=None, masses=1, friction=0.3):
     fo_func = lambdify(unknowns + parameters, fo_sym)
 
     # function which computes the derivatives of parameters
-    def gradient(y, *a, **kw):
+    def gradient(X, *a, **kw):
+        """
+        Computes the derivatives for the initialangular positions and velocities
+        that were randomly sampled.
+        """
         squeeze = False
-        if len(y.shape) == 1:
+        if len(X.shape) == 1:
             squeeze = True
-            y = np.expand_dims(y, 0)
-        rv = np.zeros_like(y)
+            X = np.expand_dims(X, 0)
+        rv = np.zeros_like(X)
 
-        for i in range(y.shape[0]):
+        for i in range(X.shape[0]):
             # Assume in rad, rad/s:
             #y = np.concatenate([np.broadcast_to(initial_positions, n), np.broadcast_to(initial_velocities, n)])
 
-            vals = np.concatenate((y[i,:], parameter_vals))
+            vals = np.concatenate((X[i,:], parameter_vals))
             sol = np.linalg.solve(mm_func(*vals), fo_func(*vals))
             rv[i,:] = np.array(sol).T[0]
 
@@ -162,7 +166,13 @@ def build(props):
         else:
             # Pick values in range [-pi, pi] radians, radians/sec
             X = (np.random.rand(NUM_EXAMPLES(n), n * 2).astype(np.float32) - 0.5) * 2 * np.pi
+
+        # Calculate gradients for our initial angular positions and angular velocities    
         Y = pen_gen(X)
+
+        # Add gradients to initial positions / velocities to create S'
+        # TODO: Check if this affects pendulum_error. This could be done somewhere else in the code instead
+        Y = X + Y
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         np.savez(cache_path, X=X, Y=Y)

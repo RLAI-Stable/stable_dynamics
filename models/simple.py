@@ -14,7 +14,7 @@ SIZE_B = 320
 model = None
 
 loss_ = nn.MSELoss()
-loss = lambda Ypred, Yactual, X, **kw: loss_(Ypred, Yactual)
+loss = lambda Ypred, Yactual, X, **kw: loss_(next_state_prediction(X, Ypred), Yactual)
 
 def loss_flatten(l):
     return [l]
@@ -40,3 +40,9 @@ def configure(props):
 
     logger.info(f"Set layer sizes to {SIZE_A} -> {SIZE_B} -> {SIZE_B} -> {SIZE_A}")
 
+def next_state_prediction(X, Ypred):
+    """
+    X: original state
+    Ypred: network prediction [we currently want it to be the gradient]
+    """
+    return X + Ypred
