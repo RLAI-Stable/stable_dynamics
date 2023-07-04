@@ -1,13 +1,14 @@
 #!/bin/bash
 # Usage ./train_many.sh <num_links> <num_runs>
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 3 ]; then
     echo "Usage: $0 <num_links> <num_runs>"
     exit 1
 fi
 
 N_LINKS="$1"
 N_RUNS="$2"
+HIGH_ENERGY="$3"
 EXP_ID="stable"
 DIRECTORY="experiments/error_${EXP_ID}"
 INNER="PSD-REHU"
@@ -18,13 +19,13 @@ rm -rf experiments/tmp
 
 N_JOBS=2
 
-for ALPHA in 0.001 0.0001
+for ALPHA in 0.001 #0.0001
 do
-    for INNER_EPSILON in 0.01 0.005 0.001
+    for INNER_EPSILON in 0.01 #0.005 0.001
     do
         for SMOOTH_V in 0
         do
-            for REHU in 0.005 0.001 0.0005
+            for REHU in 0.005 #0.001 0.0005
             do
 
                 mkdir experiments/tmp
@@ -36,7 +37,7 @@ do
                     # Run N_JOBS jobs in parallel
                     for n in $(seq 1 $N_JOBS) 
                     do
-                        ./train_pendulum_stable "$EXP_ID" "$N_LINKS" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "1"&
+                        ./train_pendulum_stable "$EXP_ID" "$N_LINKS" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "1" "$HIGH_ENERGY"&
                         NUM_RAN=$((NUM_RAN+1))
                     done
                     echo waiting after $NUM_RAN
@@ -48,7 +49,7 @@ do
                 wait
 
 
-                python3 generatePlots.py "experiments/error_${EXP_ID}/${N_LINKS}/${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
+                python3 generatePlots.py "experiments/error_${EXP_ID}/${N_LINKS}/${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}" "$HIGH_ENERGY"
 
             done
         wait

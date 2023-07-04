@@ -11,6 +11,7 @@ def main():
         # return
 
     filename = genFilename(sys.argv[1])
+    high_energy = int(sys.argv[2])
 
     # Load the data if it exists
     if not os.path.exists("experiments/tmp/0.npy"):
@@ -50,7 +51,10 @@ def main():
     plt.plot(range(len(errors)), errors)
     plt.xlabel("Timestep")
     plt.ylabel("Error")
-    plt.title(f"Error for {filename.split('/')[-2]} ({data.shape[0]} runs) - high energy")
+    if high_energy == 1:
+        plt.title(f"Error for {filename.split('/')[-2]} ({data.shape[0]} runs) - high energy (our code)")
+    else:
+        plt.title(f"Error for {filename.split('/')[-2]} ({data.shape[0]} runs) - low energy (our code)")
     plt.savefig(filename+".png")
     plt.close()
 

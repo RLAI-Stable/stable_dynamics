@@ -3,11 +3,11 @@ set -e
 
 N="$1"
 SAVE="$2"
+HIGH_ENERGY="$3"
 if SAVE=1; then
     mkdir -p experiments/tmp
 fi
 
-HIGH_ENERGY=0
 SEED=1906
 
 # Latent space dim:

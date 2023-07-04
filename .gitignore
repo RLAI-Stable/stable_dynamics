@@ -3,9 +3,8 @@
 *.log
 
 youtube
-experiments/
-experiments_old/
-pendulum-cache/
+experiments*/
+pendulum-cache*/
 runs/
 
 **/__pycache__/

@@ -36,17 +36,25 @@ def main(args):
 
     logger.info(f"Loaded physics simulator for {n}-link pendulum")
 
-    cache_path = Path("pendulum-cache") / f"p-physics-{n}.npy"
 
-    # Energy functions
-    energy = pendulum_energy.pendulum_energy(n)
+    if high_energy:
+        cache_directory = Path("pendulum-cache-high")
+    else:
+        cache_directory = Path("pendulum-cache-low")
+    cache_path = cache_directory / f"p-physics-{n}.npy"
+
+    if not os.path.exists(cache_directory):
+        os.makedirs(cache_directory)
 
     np.random.seed(args.seed)
     if not cache_path.exists():
         logger.info(f"Generating trajectories for {cache_path}")
         # Initialize args.number initial positions:
         X_init = np.zeros((args.number, 2 * n)).astype(np.float32)
-        X_init[:,:] = (np.random.rand(args.number, 2*n).astype(np.float32) - 0.5) * np.pi # Pick values in range [-pi/2, pi/2] radians, radians/sec
+        if high_energy:
+            X_init[:,:] = (np.random.rand(args.number, 2*n).astype(np.float32) - 0.5) * np.pi # Pick values in range [-pi/2, pi/2] radians, radians/sec
+        else:
+            X_init[:,:] = (np.random.rand(args.number, 2*n).astype(np.float32) - 0.5) * np.pi/4 # Pick values in range [-pi/8, pi/8] radians, radians/sec
 
         X_phy = np.zeros((args.steps, *X_init.shape), dtype=np.float32)
         X_phy[0,...] = X_init
@@ -61,7 +69,6 @@ def main(args):
 
         np.save(cache_path, X_phy)
         logger.info(f"Done generating trajectories for {cache_path}")
-
     else:
         X_phy = np.load(cache_path).astype(np.float32)
         logger.info(f"Loaded trajectories from {cache_path}")
@@ -144,20 +151,6 @@ def genFilename():
 
     print("filename generated:", filename)
     return pred_fname, filename
-
-
-def generateplot(args, filename, errors):
-    import matplotlib.pyplot as plt
-    plt.plot(range(args.steps), errors)
-    plt.xlabel("Timestep")
-    plt.ylabel("Error")
-    if args.energy:
-        plt.title(f"Error for {args.model.__name__} ({args.data._n}-links) - high energy (our code)")
-    else:
-        plt.title(f"Error for {args.model.__name__} ({args.data._n}-links) - low energy (our code)")
-    plt.savefig(filename + ".png")
-    plt.close()
-
 
 
 

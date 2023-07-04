@@ -9,21 +9,19 @@ INNER_EPSILON="$5"
 SMOOTH_V="$6"
 REHU="$7"
 SAVE="$8" # 1 to save the errors+predictions in /tmp
+HIGH_ENERGY="$9"
 if SAVE=1; then
     mkdir -p experiments/tmp
 fi
 
-HIGH_ENERGY=1
 SEED=1906
 
 # Latent space dim:
 LSD=$(( 2 * N ))
 
-RESULTSDIR="experiments/evaluation_error_stable"
 OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
 MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=60,h=100,rehu=$REHU]"
 
-mkdir -p "$RESULTSDIR"
 mkdir -p "$OUTDIR"
 echo $MODEL > "$OUTDIR/model"
 
