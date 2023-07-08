@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import sys
 import csv
 import numpy as np
@@ -6,6 +7,8 @@ import os
 HEADERS = ["alpha", "inner_epsilon", "rehu", "mean_error", "n_links", "run"]
 RESULTS_DIRECTORY = "experiments/results/error_stable/"
 CSV_RESULTS_FILE = RESULTS_DIRECTORY + "run_results.csv"
+IMAGES_DIRECTORY = "experiments/results/error_stable/images/"
+
 
 def parse_hyperparameters(model_folder):
     model_name = model_folder.split("/")[3]
@@ -41,11 +44,31 @@ def aggregate_runs_data(data_directory, results_path):
             # Write a row with the mean_error for each run
             for run_idx, mean_error in enumerate(mean_errors):
                 run_results_writer.writerow([alpha, inner_epsilon, rehu, mean_error, N_LINKS, run_idx])
+            for run_idx, errors in enumerate(errors):
+                # Plot the error against timesteps
+                plt.plot(range(len(errors)), errors, label=f"Run {run_idx}")
+            # Add legend to the plot
+            plt.legend()
+
+            # Set labels and title for the plot
+            plt.xlabel("Timestep")
+            plt.ylabel("Error")
+            plt.title(f"Error for {model_folder.split('/')[-1]} - All Runs")
+
+            # Save the plot as an image in the subfolder
+            image_path = os.path.join(model_folder, "aggregated_image.png")
+            plt.savefig(image_path)
+
+            # Clear the current plot
+            plt.clf()
 
 
 def main(N_LINKS):
     data_directory = f"experiments/error_stable/{N_LINKS}/"
+    data_directory_simple = f"experiments/error_simple/{N_LINKS}/"
+
     os.makedirs(RESULTS_DIRECTORY, exist_ok=True)
+    os.makedirs(IMAGES_DIRECTORY, exist_ok=True)
     aggregate_runs_data(data_directory, CSV_RESULTS_FILE)
 
 
