@@ -5,7 +5,9 @@
 youtube
 experiments/
 pendulum-cache/
+pendulum-cache-old/
 runs/
+mountain_car/
 
 **/__pycache__/
 .ipynb_checkpoints
