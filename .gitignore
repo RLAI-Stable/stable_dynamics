@@ -5,6 +5,7 @@
 youtube
 experiments*/
 pendulum-cache*/
+mountain_car/
 runs/
 
 **/__pycache__/
