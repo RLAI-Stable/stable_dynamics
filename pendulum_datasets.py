@@ -172,8 +172,8 @@ def compare_datasets():
     rv._redim = _redim
     print(len(X))
 
-    X_rk1_simple = gradient_rk1(X, pen_gen, h=1)
-    X_rk4_simple = gradient_rk4(X, pen_gen, h=1)
+    X_rk1_simple = gradient_rk1(X, pen_gen, h=0.5)
+    X_rk4_simple = gradient_rk4(X, pen_gen, h=0.5)
 
     X_rk1_long = gradient_rk1(X, pen_gen, h=0.01)
     X_rk4_long = gradient_rk4(X, pen_gen, h=0.01)
@@ -187,10 +187,10 @@ def compare_datasets():
         print(i, "VS rk4_long", X_rk4_long[i])
 
     print("diffs:")
-    print("rk1_simple", sum((X_rk4_long - X_rk1_simple) ** 2))
-    print("rk4_simple", sum((X_rk4_long - X_rk4_simple)))
-    print("rk1_long", sum((X_rk4_long - X_rk1_long) ** 2))
-    print("rk4_long", sum((X_rk4_long - X_rk4_long) ** 2))
+    print("Error over 1000 samples for rk1_dt_1", sum((X_rk4_long - X_rk1_simple) ** 2))
+    print("Error over 1000 samples for rk4_dt_1", sum((X_rk4_long - X_rk4_simple)))
+    print("Error over 1000 samples for rk1_dt_0.01", sum((X_rk4_long - X_rk1_long) ** 2))
+    print("Error over 1000 samples for rk4_dt_0.01 (base truth)", sum((X_rk4_long - X_rk4_long) ** 2))
 
     return rv
 
