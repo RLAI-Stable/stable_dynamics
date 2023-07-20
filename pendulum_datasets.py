@@ -172,8 +172,8 @@ def compare_datasets():
     rv._redim = _redim
     print(len(X))
 
-    X_rk1_simple = gradient_rk1(X, pen_gen, h=0.5)
-    X_rk4_simple = gradient_rk4(X, pen_gen, h=0.5)
+    X_rk1_simple = gradient_rk1(X, pen_gen, h=1)
+    X_rk4_simple = gradient_rk4(X, pen_gen, h=1)
 
     X_rk1_long = gradient_rk1(X, pen_gen, h=0.01)
     X_rk4_long = gradient_rk4(X, pen_gen, h=0.01)
