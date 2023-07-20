@@ -172,24 +172,11 @@ def compare_datasets():
     rv._redim = _redim
     print(len(X))
 
-
-    # steps = int(1/h)
-    # # Initialize args.number initial positions:
-    # X_phy = np.zeros((steps + 1, *X.shape), dtype=np.float32)
-    # X_phy[0,...] = X
-    # for i in range(1, steps + 1):
-    #     k1 = h * pen_gen(X_phy[i-1,...])
-    #     k2 = h * pen_gen(X_phy[i-1,...] + k1/2)
-    #     k3 = h * pen_gen(X_phy[i-1,...] + k2/2)
-    #     k4 = h * pen_gen(X_phy[i-1,...] + k3)
-    #     X_phy[i,...] = X_phy[i-1,...] + k1 #1/6*(k1 + 2*k2 + 2*k3 + k4)
-    #     assert not np.any(np.isnan(X_phy[i,...]))
-
     X_rk1_simple = gradient_rk1(X, pen_gen, h=1)
     X_rk4_simple = gradient_rk4(X, pen_gen, h=1)
 
-    X_rk1_long = gradient_rk1(X, pen_gen, h=0.1)
-    X_rk4_long = gradient_rk4(X, pen_gen, h=0.1)
+    X_rk1_long = gradient_rk1(X, pen_gen, h=0.01)
+    X_rk4_long = gradient_rk4(X, pen_gen, h=0.01)
 
     for i in range(X.shape[0]):
         print("---------------------------------")
@@ -200,10 +187,10 @@ def compare_datasets():
         print(i, "VS rk4_long", X_rk4_long[i])
 
     print("diffs:")
-    print(i, "rk1_simple", sum(X_rk4_long - X_rk1_simple))
-    print(i, "rk4_simple", sum(X_rk4_long - X_rk4_simple))
-    print(i, "rk1_long", sum(X_rk4_long - X_rk1_long))
-    print(i, "rk4_long", sum(X_rk4_long - X_rk4_long))
+    print("rk1_simple", sum((X_rk4_long - X_rk1_simple) ** 2))
+    print("rk4_simple", sum((X_rk4_long - X_rk4_simple)))
+    print("rk1_long", sum((X_rk4_long - X_rk1_long) ** 2))
+    print("rk4_long", sum((X_rk4_long - X_rk4_long) ** 2))
 
     return rv
 
