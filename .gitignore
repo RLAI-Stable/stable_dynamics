@@ -3,9 +3,8 @@
 *.log
 
 youtube
-experiments/
-pendulum-cache/
-pendulum-cache-old/
+experiments*/
+pendulum-cache*/
 runs/
 mountain_car/
 
