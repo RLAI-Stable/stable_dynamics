@@ -109,7 +109,8 @@ def pendulum_gradient(n, lengths=None, masses=1, friction=0.3):
             vals = np.concatenate((y[i,:], parameter_vals))
             sol = np.linalg.solve(mm_func(*vals), fo_func(*vals))
             rv[i,:] = np.array(sol).T[0]
-
+            dt = 0.1
+            rv = dt * rv
         if squeeze:
             return rv[0,...]
         return rv
