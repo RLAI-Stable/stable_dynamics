@@ -158,6 +158,12 @@ def build(props):
     pen_gen = pendulum_gradient(n)
     le_str = "-lowenergy" if lowenergy else ""
     cache_path = CACHE / f"p-{n}{le_str}-{test}.npz"
+
+    # Regenerate data at each run:
+    if cache_path.exists():
+       cache_path.unlink()
+
+
     if not cache_path.exists():
         if lowenergy:
             X = np.zeros((NUM_EXAMPLES(n), 2 * n))
@@ -167,12 +173,30 @@ def build(props):
             # Pick values in range [-pi, pi] radians, radians/sec
             X = (np.random.rand(NUM_EXAMPLES(n), n * 2).astype(np.float32) - 0.5) * 2 * np.pi
 
-        # Calculate gradients for our initial angular positions and angular velocities    
-        Y = pen_gen(X)
+        # # Add gradients to initial positions / velocities to create S'
+        # # TODO: Check if this affects pendulum_error. This could be done somewhere else in the code instead
+        # h = 1
+        # Y = pen_gen(X)
+        # Y = X + (h * Y)
 
-        # Add gradients to initial positions / velocities to create S'
-        # TODO: Check if this affects pendulum_error. This could be done somewhere else in the code instead
-        Y = X + Y
+        # USE RK4 instead:
+        h = 1
+        k1 = pen_gen(X)
+        k2 = pen_gen(X + (h * k1/2))
+        k3 = pen_gen(X + (h * k2/2))
+        k4 = pen_gen(X + (h * k3))
+        Y = X + (h/6 * (k1 + 2*k2 + 2*k3 + k4))
+
+        # h = 0.01
+        # k = int(1/h)
+        # assert k == 1/h, "h must be 1/n for some integer n"
+
+        # tmp = X
+        # for i in range(k):
+        #     tmp = tmp + (h * pen_gen(tmp)) # Find the gradient in the current position, and take a 1/k = h step in that direction
+        # Y = tmp
+
+
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         np.savez(cache_path, X=X, Y=Y)
