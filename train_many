@@ -16,15 +16,15 @@ mkdir -p "$DIRECTORY"
 # Clear tmp directory
 rm -rf experiments/tmp
 
-N_JOBS=2
+N_JOBS=1
 
-for ALPHA in 0.001 0.0001
+for ALPHA in 0.001 #0.0001
 do
-    for INNER_EPSILON in 0.01 0.005 0.001
+    for INNER_EPSILON in 0.01 #0.005 0.001
     do
         for SMOOTH_V in 0
         do
-            for REHU in 0.005 0.001 0.0005
+            for REHU in 0.005 #0.001 0.0005
             do
 
                 mkdir experiments/tmp
@@ -34,10 +34,12 @@ do
                 do
 
                     # Run N_JOBS jobs in parallel
-                    for n in $(seq 1 $N_JOBS) 
+                    JOBS_STARTED=0
+                    while [ $JOBS_STARTED -lt $N_JOBS ] && [ $NUM_RAN -lt $N_RUNS ]
                     do
                         ./train_pendulum_stable "$EXP_ID" "$N_LINKS" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "1"&
                         NUM_RAN=$((NUM_RAN+1))
+                        JOBS_STARTED=$((JOBS_STARTED+1))
                     done
                     echo waiting after $NUM_RAN
                     wait
