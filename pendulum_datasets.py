@@ -187,10 +187,10 @@ def compare_datasets():
         print(i, "VS rk4_long", X_rk4_long[i])
 
     print("diffs:")
-    print("Error over 1000 samples for rk1_dt_1", sum((X_rk4_long - X_rk1_simple) ** 2))
-    print("Error over 1000 samples for rk4_dt_1", sum((X_rk4_long - X_rk4_simple) ** 2))
-    print("Error over 1000 samples for rk1_dt_0.01", sum((X_rk4_long - X_rk1_long) ** 2))
-    print("Error over 1000 samples for rk4_dt_0.01 (base truth)", sum((X_rk4_long - X_rk4_long) ** 2))
+    print("Error over 1000 samples for rk1_dt_1", np.sum((X_rk4_long - X_rk1_simple) ** 2))
+    print("Error over 1000 samples for rk4_dt_1", np.sum((X_rk4_long - X_rk4_simple) ** 2))
+    print("Error over 1000 samples for rk1_dt_0.01", np.sum((X_rk4_long - X_rk1_long) ** 2))
+    print("Error over 1000 samples for rk4_dt_0.01 (base truth)", np.sum((X_rk4_long - X_rk4_long) ** 2))
 
     return rv
 
