@@ -163,7 +163,10 @@ def build(props):
         else:
             # Pick values in range [-pi, pi] radians, radians/sec
             X = (np.random.rand(NUM_EXAMPLES(n), n * 2).astype(np.float32) - 0.5) * 2 * np.pi
-        Y = pen_gen(X)
+        # Y = pen_gen(X)
+
+        Y = next_state_rk1(X, pen_gen, h=1)
+
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         np.savez(cache_path, X=X, Y=Y)
@@ -177,6 +180,32 @@ def build(props):
     rv._n = n
     rv._redim = _redim
     return rv
+
+
+def next_state_rk4(X, pen_gen, h=0.01):
+    steps = int(1/h)
+    # Initialize args.number initial positions:
+    curr = X
+    for _ in range(steps):
+        k1 = h * pen_gen(curr)
+        k2 = h * pen_gen(curr + k1/2)
+        k3 = h * pen_gen(curr + k2/2)
+        k4 = h * pen_gen(curr + k3)
+        curr = curr + 1/6*(k1 + 2*k2 + 2*k3 + k4)
+        assert not np.any(np.isnan(curr))
+    return curr
+
+def next_state_rk1(X, pen_gen, h=0.01):
+    steps = int(1/h)
+    # Initialize args.number initial positions:
+    curr = X
+    for _ in range(steps):
+        k1 = h * pen_gen(curr)
+        assert not np.any(np.isnan(curr))
+    return curr
+
+
+
 
 if __name__ == "__main__":
     # Continuous-time dynamics, learning function [x, x']_t -> [x', x'']_{t+1}
