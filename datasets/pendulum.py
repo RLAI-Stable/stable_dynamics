@@ -109,8 +109,6 @@ def pendulum_gradient(n, lengths=None, masses=1, friction=0.3):
             vals = np.concatenate((y[i,:], parameter_vals))
             sol = np.linalg.solve(mm_func(*vals), fo_func(*vals))
             rv[i,:] = np.array(sol).T[0]
-            dt = 0.1
-            rv = dt * rv
         if squeeze:
             return rv[0,...]
         return rv
@@ -163,9 +161,9 @@ def build(props):
         else:
             # Pick values in range [-pi, pi] radians, radians/sec
             X = (np.random.rand(NUM_EXAMPLES(n), n * 2).astype(np.float32) - 0.5) * 2 * np.pi
-        # Y = pen_gen(X)
+        #Y = pen_gen(X)
 
-        Y = next_state_rk1(X, pen_gen, h=1)
+        Y = next_state_rk1(X, pen_gen, h=0.01) - X
 
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -201,6 +199,7 @@ def next_state_rk1(X, pen_gen, h=0.01):
     curr = X
     for _ in range(steps):
         k1 = h * pen_gen(curr)
+        curr += k1
         assert not np.any(np.isnan(curr))
     return curr
 
