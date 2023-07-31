@@ -163,7 +163,7 @@ def build(props):
             X = (np.random.rand(NUM_EXAMPLES(n), n * 2).astype(np.float32) - 0.5) * 2 * np.pi
         #Y = pen_gen(X)
 
-        Y = next_state_rk1(X, pen_gen, h=0.01) - X
+        Y = next_state_rk1(np.copy(X), pen_gen, h=0.1) - X
 
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)
@@ -180,7 +180,7 @@ def build(props):
     return rv
 
 
-def next_state_rk4(X, pen_gen, h=0.01):
+def next_state_rk4(X, pen_gen, h):
     steps = int(1/h)
     # Initialize args.number initial positions:
     curr = X
@@ -193,7 +193,7 @@ def next_state_rk4(X, pen_gen, h=0.01):
         assert not np.any(np.isnan(curr))
     return curr
 
-def next_state_rk1(X, pen_gen, h=0.01):
+def next_state_rk1(X, pen_gen, h):
     steps = int(1/h)
     # Initialize args.number initial positions:
     curr = X
