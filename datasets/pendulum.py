@@ -158,7 +158,15 @@ def build(props):
     pen_gen = pendulum_gradient(n)
     le_str = "-lowenergy" if lowenergy else ""
     cache_path = CACHE / f"p-{n}{le_str}-{test}.npz"
-    if not cache_path.exists():
+
+    ####################################################################
+    # Remove this, it is used to always regen data for every run
+    if CACHE.exists():
+        import shutil
+        shutil.rmtree(CACHE)
+    ####################################################################
+
+    if not cache_path.exists(): 
         if lowenergy:
             X = np.zeros((NUM_EXAMPLES(n), 2 * n))
             # Pick values for displacement in range [-pi/4, pi/4] radians
@@ -172,7 +180,8 @@ def build(props):
 
         # Add gradients to initial positions / velocities to create S'
         # TODO: Check if this affects pendulum_error. This could be done somewhere else in the code instead
-        Y = X + Y
+        dt = 1
+        Y = X + dt*Y
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         np.savez(cache_path, X=X, Y=Y)
