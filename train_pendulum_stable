@@ -8,8 +8,9 @@ INNER="$4"
 INNER_EPSILON="$5"
 SMOOTH_V="$6"
 REHU="$7"
-SAVE="$8" # 1 to save the errors+predictions in /tmp
-HIGH_ENERGY="$9"
+DT="$8"
+SAVE="$9" # 1 to save the errors+predictions in /tmp
+HIGH_ENERGY="${10}"
 if SAVE=1; then
     mkdir -p experiments/tmp
 fi
@@ -20,7 +21,7 @@ SEED=1906
 LSD=$(( 2 * N ))
 
 OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
-MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=60,h=100,rehu=$REHU]"
+MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=60,h=100,rehu=$REHU,dt=$DT]"
 
 mkdir -p "$OUTDIR"
 echo $MODEL > "$OUTDIR/model"

@@ -2,7 +2,7 @@
 # Usage ./train_many.sh <num_links> <num_runs>
 
 if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <num_links> <num_runs>"
+    echo "Usage: $0 <num_links> <num_runs> <high_energy=0/1>"
     exit 1
 fi
 
@@ -12,6 +12,8 @@ HIGH_ENERGY="$3"
 EXP_ID="stable"
 DIRECTORY="experiments/error_${EXP_ID}"
 INNER="PSD-REHU"
+DT="1"
+SAVE="1"
 
 mkdir -p "$DIRECTORY"
 # Clear tmp directory
@@ -35,14 +37,15 @@ do
                 do
 
                     # Run N_JOBS jobs in parallel
-                    for n in $(seq 1 $N_JOBS) 
+                    JOBS_STARTED=0
+                    while [ $JOBS_STARTED -lt $N_JOBS ] && [ $NUM_RAN -lt $N_RUNS ]
                     do
-                        ./train_pendulum_stable "$EXP_ID" "$N_LINKS" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "1" "$HIGH_ENERGY"&
+                        ./train_pendulum_stable "$EXP_ID" "$N_LINKS" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" "$HIGH_ENERGY"&
                         NUM_RAN=$((NUM_RAN+1))
+                        JOBS_STARTED=$((JOBS_STARTED+1))
                     done
                     echo waiting after $NUM_RAN
                     wait
-                    echo ended waiting
 
                 done
                 echo ended running jobs in parallel for $ALPHA $INNER_EPSILON $SMOOTH_V $REHU

@@ -1,5 +1,6 @@
 import logging
 import math
+from typing import Any, Mapping
 
 import torch
 import torch.nn.functional as F
@@ -138,6 +139,16 @@ class PosDefICNN(nn.Module):
         z = F.linear(x, self.W[-1]) + F.linear(z, F.softplus(self.U[-1]))
         return F.relu(z) + self.eps*(x**2).sum(1)[:,None]
 
+class NextStateGenerator(nn.Module):
+    def __init__(self, network, dt=1):
+        super().__init__()
+        self.network = network
+        self.dt = dt
+
+    def forward(self, x):
+        return x + self.dt*self.network(x)
+
+
 def loss(Ypred, Yactual, X):
     # Force smoothness in V:
     # penalty for new_V being larget than old V:
@@ -247,3 +258,5 @@ def configure(props):
 
     global model
     model = Dynamics(fhat, V, alpha=alpha)
+    if "dt" in props:
+        model = NextStateGenerator(model, dt=float(props["dt"]))
