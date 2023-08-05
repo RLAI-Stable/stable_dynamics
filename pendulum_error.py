@@ -82,17 +82,20 @@ def main(args):
 
         # Generate prediction
         X_nn.requires_grad = True
-        k1 = h * model(X_nn)
-        k1 = k1.detach()
-        k2 = h * model(X_nn + k1/2)
-        k2 = k2.detach()
-        k3 = h * model(X_nn + k2/2)
-        k3 = k3.detach()
-        k4 = h * model(X_nn + k3)
-        k4 = k4.detach()
-        X_nn = X_nn + 1/6*(k1 + 2*k2 + 2*k3 + k4)
-        X_nn = X_nn.detach()
-        y = X_nn.cpu().numpy()
+        Y_nn = model(X_nn)
+        y = X_nn.detach().cpu().numpy()
+
+        # k1 = h * model(X_nn)
+        # k1 = k1.detach()
+        # k2 = h * model(X_nn + k1/2)
+        # k2 = k2.detach()
+        # k3 = h * model(X_nn + k2/2)
+        # k3 = k3.detach()
+        # k4 = h * model(X_nn + k3)
+        # k4 = k4.detach()
+        # X_nn = X_nn + 1/6*(k1 + 2*k2 + 2*k3 + k4)
+        # X_nn = X_nn.detach()
+        # y = X_nn.cpu().numpy()
 
         # Save pred to X_pred
         if args.save:
