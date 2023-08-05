@@ -159,13 +159,6 @@ def build(props):
     le_str = "-lowenergy" if lowenergy else ""
     cache_path = CACHE / f"p-{n}{le_str}-{test}.npz"
 
-    ####################################################################
-    # Remove this, it is used to always regen data for every run
-    if CACHE.exists():
-        import shutil
-        shutil.rmtree(CACHE)
-    ####################################################################
-
     if not cache_path.exists(): 
         if lowenergy:
             X = np.zeros((NUM_EXAMPLES(n), 2 * n))
@@ -181,7 +174,7 @@ def build(props):
         # Add gradients to initial positions / velocities to create S'
         # TODO: Check if this affects pendulum_error. This could be done somewhere else in the code instead
         dt = 1
-        Y = X + dt*Y
+        Y = X + dt * Y
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         np.savez(cache_path, X=X, Y=Y)

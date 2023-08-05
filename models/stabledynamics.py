@@ -146,7 +146,8 @@ class NextStateGenerator(nn.Module):
         self.dt = dt
 
     def forward(self, x):
-        return x + self.dt*self.network(x)
+        return self.dt*self.network(x)
+        #return x + self.dt*self.network(x)
 
 
 def loss(Ypred, Yactual, X):
