@@ -173,7 +173,7 @@ def build(props):
 
         # Add gradients to initial positions / velocities to create S'
         # TODO: Check if this affects pendulum_error. This could be done somewhere else in the code instead
-        dt = 1
+        dt = 0.1
         Y = X + dt * Y
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)

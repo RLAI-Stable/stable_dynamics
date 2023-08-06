@@ -75,6 +75,8 @@ def main(args):
 
     X_nn = to_variable(torch.tensor(X_phy[0,:,:]), cuda=torch.cuda.is_available()) # Initial position
     errors = np.zeros((args.steps,)) # Error for each timestep
+    model_dt = 0.1
+    model_h = h / 0.1
     if args.save:
         X_pred = np.zeros((args.steps, *X_nn.shape)) # Predicted trajectory (to save)
     for i in range(1, args.steps):
@@ -82,13 +84,13 @@ def main(args):
 
         # Generate prediction
         X_nn.requires_grad = True
-        k1 = h * model(X_nn)
+        k1 = model_h * model(X_nn)
         k1 = k1.detach()
-        k2 = h * model(X_nn + k1/2)
+        k2 = model_h * model(X_nn + k1/2)
         k2 = k2.detach()
-        k3 = h * model(X_nn + k2/2)
+        k3 = model_h * model(X_nn + k2/2)
         k3 = k3.detach()
-        k4 = h * model(X_nn + k3)
+        k4 = model_h * model(X_nn + k3)
         k4 = k4.detach()
         X_nn = X_nn + 1/6*(k1 + 2*k2 + 2*k3 + k4)
         X_nn = X_nn.detach()
