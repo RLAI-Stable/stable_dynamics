@@ -158,7 +158,7 @@ def build(props):
 
     pen_gen = pendulum_gradient(n)
     le_str = "-lowenergy" if lowenergy else ""
-    cache_path = CACHE / f"p-{n}{le_str}-{test}.npz"
+    cache_path = CACHE / f"p-{n}{le_str}-{str(dt)}-{test}.npz"
 
     if not cache_path.exists(): 
         if lowenergy:

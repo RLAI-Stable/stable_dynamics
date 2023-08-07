@@ -4,7 +4,7 @@ set -e
 N="$1"
 SAVE="$2"
 HIGH_ENERGY="$3"
-TRAINING_DT="0.01"
+TRAINING_DT="${4}"
 if SAVE=1; then
     mkdir -p experiments/tmp
 fi
