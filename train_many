@@ -16,6 +16,7 @@ DT="1"
 SAVE="1"
 TRAINING_DT="0.01"
 
+
 mkdir -p "$DIRECTORY"
 # Clear tmp directory
 rm -rf experiments/tmp
@@ -53,7 +54,7 @@ do
                 wait
 
 
-                python3 generatePlots.py "experiments/error_${EXP_ID}/${N_LINKS}/${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}" "$HIGH_ENERGY"
+                python3 generatePlots.py "experiments/error_${EXP_ID}/${N_LINKS}/${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}" "$HIGH_ENERGY" "$TRAINING_DT"
 
             done
         wait
