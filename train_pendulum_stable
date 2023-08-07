@@ -10,7 +10,8 @@ SMOOTH_V="$6"
 REHU="$7"
 DT="$8"
 SAVE="$9" # 1 to save the errors+predictions in /tmp
-HIGH_ENERGY="${10}"
+TRAINING_DT="${10}"
+HIGH_ENERGY="${11}"
 if SAVE=1; then
     mkdir -p experiments/tmp
 fi
@@ -24,6 +25,7 @@ OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_$
 MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=60,h=100,rehu=$REHU,dt=$DT]"
 
 mkdir -p "$OUTDIR"
+
 echo $MODEL > "$OUTDIR/model"
 
 date >> "$OUTDIR/progress.txt"
@@ -32,8 +34,8 @@ date >> "$OUTDIR/progress.txt"
     --batch-size 2000                       \
     --learning-rate "0.001"                 \
     --epochs 1000                           \
-    --test-with "pendulum[n=$N,test]"       \
-    "pendulum[n=$N]"                        \
+    --test-with "pendulum[n=$N,test,dt=$TRAINING_DT]"       \
+    "pendulum[n=$N,dt=$TRAINING_DT]"                        \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
 
@@ -44,4 +46,5 @@ date >> "$OUTDIR/progress.txt"
     1000                                    \
     "$SAVE"                                 \
     "$HIGH_ENERGY"                          \
+    "$TRAINING_DT"                          \
     "$SEED"    | tee -a "$OUTDIR/eval.txt"

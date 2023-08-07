@@ -4,6 +4,7 @@ set -e
 N="$1"
 SAVE="$2"
 HIGH_ENERGY="$3"
+TRAINING_DT="0.01"
 if SAVE=1; then
     mkdir -p experiments/tmp
 fi
@@ -27,10 +28,11 @@ date >> "$OUTDIR/progress.txt"
     --batch-size 2000                       \
     --learning-rate "0.001"                 \
     --epochs 1000                           \
-    --test-with "pendulum[n=$N,test]"       \
-    "pendulum[n=$N]"                        \
+    --test-with "pendulum[n=$N,test,dt=$TRAINING_DT]"       \
+    "pendulum[n=$N,dt=$TRAINING_DT]"                        \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
+
 
 ./.colorize ./pendulum_error.py             \
     pendulum[n=$N,test]                     \
@@ -39,4 +41,5 @@ date >> "$OUTDIR/progress.txt"
     1000                                    \
     "$SAVE"                                 \
     "$HIGH_ENERGY"                          \
+    "$TRAINING_DT"                          \
     "$SEED"    | tee -a "$OUTDIR/eval.txt"

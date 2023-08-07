@@ -152,6 +152,7 @@ NUM_EXAMPLES = lambda n: 200 * n
 def build(props):
     # Number of joints in the pendulum:
     n = int(props["n"]) if "n" in props else 1
+    dt = float(props["dt"]) if "dt" in props else 1
     test = "test" if "test" in props else "train"
     lowenergy =  "lowenergy" in props
 
@@ -173,7 +174,6 @@ def build(props):
 
         # Add gradients to initial positions / velocities to create S'
         # TODO: Check if this affects pendulum_error. This could be done somewhere else in the code instead
-        dt = 0.1
         Y = X + dt * Y
 
         cache_path.parent.mkdir(parents=True, exist_ok=True)

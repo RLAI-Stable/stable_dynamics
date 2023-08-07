@@ -146,8 +146,8 @@ class NextStateGenerator(nn.Module):
         self.dt = dt
 
     def forward(self, x):
-        # return self.dt*self.network(x)
-        return x + self.dt*self.network(x)
+        return self.dt*self.network(x)
+        #return x + self.dt*self.network(x)
 
 
 def loss(Ypred, Yactual, X):
@@ -167,8 +167,9 @@ def loss(Ypred, Yactual, X):
 
         Vloss = (V(succ_X) - V(X)).clamp(min=0).mean()
 
-    l2loss = ((Ypred - Yactual)**2).mean()
-
+    #l2loss = ((Ypred - Yactual)**2).mean()
+    l2loss = ((next_state_prediction(X, Ypred) - Yactual)**2).mean()
+    
     return (l2loss + SMOOTH_V * Vloss, l2loss, Vloss)
 
 global model, SMOOTH_V

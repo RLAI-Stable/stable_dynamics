@@ -31,6 +31,7 @@ def main(args):
 
     physics = args.data._pendulum_gen
     n = args.data._n
+    training_dt = args.dt
     redim = args.data._redim
     h = args.timestep
 
@@ -75,29 +76,27 @@ def main(args):
 
     X_nn = to_variable(torch.tensor(X_phy[0,:,:]), cuda=torch.cuda.is_available()) # Initial position
     errors = np.zeros((args.steps,)) # Error for each timestep
-    model_dt = 0.1
-    model_h = h / 0.1
+
     if args.save:
         X_pred = np.zeros((args.steps, *X_nn.shape)) # Predicted trajectory (to save)
+
+    model_h = h / training_dt    
     for i in range(1, args.steps):
         logger.info(f"Timestep {i}")
 
         # Generate prediction
         X_nn.requires_grad = True
-        Y_nn = model(X_nn)
-        y = X_nn.detach().cpu().numpy()
-
-        # k1 = h * model(X_nn)
-        # k1 = k1.detach()
-        # k2 = h * model(X_nn + k1/2)
-        # k2 = k2.detach()
-        # k3 = h * model(X_nn + k2/2)
-        # k3 = k3.detach()
-        # k4 = h * model(X_nn + k3)
-        # k4 = k4.detach()
-        # X_nn = X_nn + 1/6*(k1 + 2*k2 + 2*k3 + k4)
-        # X_nn = X_nn.detach()
-        # y = X_nn.cpu().numpy()
+        k1 = model_h * model(X_nn)
+        k1 = k1.detach()
+        k2 = model_h * model(X_nn + k1/2)
+        k2 = k2.detach()
+        k3 = model_h * model(X_nn + k2/2)
+        k3 = k3.detach()
+        k4 = model_h * model(X_nn + k3)
+        k4 = k4.detach()
+        X_nn = X_nn + 1/6*(k1 + 2*k2 + 2*k3 + k4)
+        X_nn = X_nn.detach()
+        y = X_nn.cpu().numpy()
 
         # Save pred to X_pred
         if args.save:
@@ -171,6 +170,7 @@ if __name__ == "__main__":
 
     parser.add_argument('save', type=int, help="1 to save the prediciton and error to /tmp, 0 if not")
     parser.add_argument('energy', type=int, help="1 for high energy, 0 if low (affects the initial positions)")
+    parser.add_argument('dt', type=float, help="dt used during training")
     parser.add_argument('seed', type=int, help="seed for the random generator")
 
     main(parser.parse_args())
