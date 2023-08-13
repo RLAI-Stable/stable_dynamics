@@ -201,6 +201,8 @@ def configure(props):
     ph_dim = int(props["hp"]) if "hp" in props else 40
     logger.info(f"Set hidden layer size to {h_dim} and hidden layer in projection to {ph_dim}")
 
+    mode = props["mode"] if "mode" in props else "Xt+1 (our)"
+
     if "scale_fx" in props and props["scale_fx"] not in ["false", "False"]:
         logger.info(f"Scaling fx to prevent errors from too-large steps in Euler integration")
         SCALE_FX = True

@@ -1,14 +1,15 @@
 #!/bin/bash
 # Usage ./train_many_simple.sh <num_links> <num_runs>
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <num_links> <num_runs> <high_energy>"
+if [ "$#" -ne 4 ]; then
+    echo "Usage: $0 <num_links> <num_runs> <high_energy> <training_dt>"
     exit 1
 fi
 
 N_LINKS="$1"
 N_RUNS="$2"
 HIGH_ENERGY="$3"
+TRAINING_DT="${4}"
 EXP_ID="simple"
 DIRECTORY="experiments/error_${EXP_ID}"
 
@@ -28,7 +29,7 @@ do
     # Run N_JOBS jobs in parallel
     for n in $(seq 1 $N_JOBS) 
     do
-        ./train_pendulum_simple "$N_LINKS" "1" "$HIGH_ENERGY"&
+        ./train_pendulum_simple "$N_LINKS" "1" "$TRAINING_DT" "$HIGH_ENERGY"&
         NUM_RAN=$((NUM_RAN+1))
     done
 
@@ -40,7 +41,7 @@ done
 wait
 
 
-python3 generatePlots.py "experiments/error_${EXP_ID}/${N_LINKS}" "$HIGH_ENERGY"
+python3 generatePlots.py "experiments/error_${EXP_ID}/${N_LINKS}" "$HIGH_ENERGY" "$TRAINING_DT"
 
 
 
