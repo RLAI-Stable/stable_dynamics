@@ -59,6 +59,8 @@ def main(args):
 
         X_phy = np.zeros((args.steps, *X_init.shape), dtype=np.float32)
         X_phy[0,...] = X_init
+
+        h = training_dt
         for i in range(1, args.steps):
             logger.info(f"Timestep {i}")
             k1 = h * physics(X_phy[i-1,...])
@@ -79,15 +81,12 @@ def main(args):
 
     if args.save:
         X_pred = np.zeros((args.steps, *X_nn.shape)) # Predicted trajectory (to save)
-
-    model_h = h / training_dt   
-    # TODO: use RK1 here
     for i in range(1, args.steps):
         logger.info(f"Timestep {i}")
 
         # Generate prediction
         X_nn.requires_grad = True
-        k1 = model_h * model(X_nn)
+        k1 = model(X_nn)
         k1 = k1.detach()
 
         X_nn = X_nn + k1
