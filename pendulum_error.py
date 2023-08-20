@@ -34,15 +34,19 @@ def main(args):
     training_dt = args.dt
     redim = args.data._redim
     h = args.timestep
-
+    steps = args.steps * (h / training_dt) 
+    steps = int(steps)
     logger.info(f"Loaded physics simulator for {n}-link pendulum")
+
+    h = training_dt
+
 
 
     if high_energy:
         cache_directory = Path("pendulum-cache-high")
     else:
         cache_directory = Path("pendulum-cache-low")
-    cache_path = cache_directory / f"p-physics-{n}.npy"
+    cache_path = cache_directory / f"p-physics-{n}-{h}.npy"
 
     if not os.path.exists(cache_directory):
         os.makedirs(cache_directory)
@@ -57,11 +61,12 @@ def main(args):
         else:
             X_init[:,:] = (np.random.rand(args.number, 2*n).astype(np.float32) - 0.5) * np.pi/4 # Pick values in range [-pi/8, pi/8] radians, radians/sec
 
-        X_phy = np.zeros((args.steps, *X_init.shape), dtype=np.float32)
+
+        X_phy = np.zeros((steps, *X_init.shape), dtype=np.float32)
         X_phy[0,...] = X_init
 
         h = training_dt
-        for i in range(1, args.steps):
+        for i in range(1, steps):
             logger.info(f"Timestep {i}")
             k1 = h * physics(X_phy[i-1,...])
             k2 = h * physics(X_phy[i-1,...] + k1/2)
@@ -77,11 +82,13 @@ def main(args):
         logger.info(f"Loaded trajectories from {cache_path}")
 
     X_nn = to_variable(torch.tensor(X_phy[0,:,:]), cuda=torch.cuda.is_available()) # Initial position
-    errors = np.zeros((args.steps,)) # Error for each timestep
+    errors = np.zeros((steps,)) # Error for each timestep
 
     if args.save:
-        X_pred = np.zeros((args.steps, *X_nn.shape)) # Predicted trajectory (to save)
-    for i in range(1, args.steps):
+        X_pred = np.zeros((steps, *X_nn.shape)) # Predicted trajectory (to save)
+
+    # Generate model prediction    
+    for i in range(1, steps):
         logger.info(f"Timestep {i}")
 
         # Generate prediction
@@ -114,7 +121,7 @@ def main(args):
 
     # for i in range(args.steps):
     #     print(f"{i}\t{np.sum(errors[0:i])}\t{errors[i]}"
-    print(f"Avg error: {np.sum(errors)/args.steps}")
+    print(f"Avg error: {np.sum(errors)/steps}")
 
 
 

@@ -2,7 +2,7 @@
 # Usage ./train_many.sh <num_links> <num_runs>
 
 if [ "$#" -ne 4 ]; then
-    echo "Usage: $0 <num_links> <num_runs> <high_energy=0/1>"
+    echo "Usage: $0 <num_links> <num_runs> <high_energy=0/1> <training_dt>"
     exit 1
 fi
 
