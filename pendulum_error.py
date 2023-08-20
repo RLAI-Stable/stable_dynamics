@@ -33,16 +33,17 @@ def main(args):
     n = args.data._n
     training_dt = args.dt
     redim = args.data._redim
-    h = args.timestep
+    h = training_dt
 
     logger.info(f"Loaded physics simulator for {n}-link pendulum")
 
 
     if high_energy:
         cache_directory = Path("pendulum-cache-high")
+        cache_path = cache_directory / f"p-physics-{n}-{h}.npy"
     else:
         cache_directory = Path("pendulum-cache-low")
-    cache_path = cache_directory / f"p-physics-{n}.npy"
+        cache_path = cache_directory / f"p-physics-{n}-{h}.npy"
 
     if not os.path.exists(cache_directory):
         os.makedirs(cache_directory)
