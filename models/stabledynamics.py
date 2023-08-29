@@ -208,9 +208,14 @@ def configure(props):
         SCALE_FX = True
 
     # The function to learn
-    fhat = nn.Sequential(nn.Linear(lsd, h_dim), nn.ReLU(),
-                        nn.Linear(h_dim, h_dim), nn.ReLU(),
-                        nn.Linear(h_dim, lsd))
+    if 'mountain_car' in props:
+        fhat = nn.Sequential(nn.Linear(lsd, h_dim), nn.ReLU(),
+                            nn.Linear(h_dim, h_dim), nn.ReLU(),
+                            nn.Linear(h_dim, lsd-1))
+    else:
+        fhat = nn.Sequential(nn.Linear(lsd, h_dim), nn.ReLU(),
+                            nn.Linear(h_dim, h_dim), nn.ReLU(),
+                            nn.Linear(h_dim, lsd))
 
     ## The convex function to project onto:
     projfn_eps = float(props["projfn_eps"]) if "projfn_eps" in props else 0.01
@@ -262,5 +267,7 @@ def configure(props):
 
     global model
     model = Dynamics(fhat, V, alpha=alpha)
-    if "dt" in props:
-        model = NextStateGenerator(model, dt=float(props["dt"]))
+    if 'dt' in props:
+        model = NextStateGenerator(model, dt=float(props['dt']))
+    elif 'mountain_car' in props:
+        model = NextStateGenerator(model, dt=1/100)
