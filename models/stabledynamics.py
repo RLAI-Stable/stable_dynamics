@@ -167,8 +167,9 @@ def loss(Ypred, Yactual, X):
 
         Vloss = (V(succ_X) - V(X)).clamp(min=0).mean()
 
-    #l2loss = ((Ypred - Yactual)**2).mean()
-    l2loss = ((next_state_prediction(X, Ypred) - Yactual)**2).mean()
+    # TODO: Compute loss only on the first sensor
+    l2loss = ((Ypred[:, 0] - Yactual[:, 0]) ** 2).mean()
+    #l2loss = ((next_state_prediction(X, Ypred) - Yactual)**2).mean()
     
     return (l2loss + SMOOTH_V * Vloss, l2loss, Vloss)
 
@@ -208,14 +209,10 @@ def configure(props):
         SCALE_FX = True
 
     # The function to learn
-    if 'mountain_car' in props:
-        fhat = nn.Sequential(nn.Linear(lsd, h_dim), nn.ReLU(),
-                            nn.Linear(h_dim, h_dim), nn.ReLU(),
-                            nn.Linear(h_dim, lsd-1))
-    else:
-        fhat = nn.Sequential(nn.Linear(lsd, h_dim), nn.ReLU(),
-                            nn.Linear(h_dim, h_dim), nn.ReLU(),
-                            nn.Linear(h_dim, lsd))
+
+    fhat = nn.Sequential(nn.Linear(lsd, h_dim), nn.ReLU(),
+                        nn.Linear(h_dim, h_dim), nn.ReLU(),
+                        nn.Linear(h_dim, lsd))
 
     ## The convex function to project onto:
     projfn_eps = float(props["projfn_eps"]) if "projfn_eps" in props else 0.01

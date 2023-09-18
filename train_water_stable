@@ -1,0 +1,37 @@
+#!/bin/bash
+set -e
+
+EXP_ID="$1"
+ALPHA="$2"
+INNER="$3"
+INNER_EPSILON="$4"
+SMOOTH_V="$5"
+REHU="$6"
+DT="$7"
+SAVE="$8" # 1 to save the errors+predictions in /tmp
+if SAVE=1; then
+    mkdir -p experiments/tmp
+fi
+
+SEED=1906
+
+# Latent space dim:
+LSD=142
+
+OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
+MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=100,h=60,rehu=$REHU,dt=$DT]"
+
+mkdir -p "$OUTDIR"
+
+echo $MODEL > "$OUTDIR/model"
+
+date >> "$OUTDIR/progress.txt"
+./.colorize ./train.py                      \
+    --log-to "runs/$OUTDIR"                 \
+    --batch-size 2000                       \
+    --learning-rate "0.001"                 \
+    --epochs 5                          \
+    --test-with "waterplant[test]"         \
+    "waterplant[train]"                       \
+    "$MODEL"                                \
+    "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"

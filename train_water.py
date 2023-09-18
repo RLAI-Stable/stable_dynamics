@@ -85,6 +85,7 @@ def main(args):
             optimizer.zero_grad()
             loss, _ = runbatch(args, model, args.model.loss, data)
             loss_parts.append(np.array([l.cpu().item() for l in args.model.loss_flatten(loss)]))
+
             optim_loss = loss[0] if isinstance(loss, (tuple, list)) else loss
             optim_loss.backward()
             optimizer.step()
