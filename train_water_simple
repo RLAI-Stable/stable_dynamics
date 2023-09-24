@@ -15,9 +15,10 @@ LSD=142
 OUTDIR="experiments/water-simple/"
 MODEL="simple[a=$LSD,b=512]"
 
-mkdir -p "$RESULTSDIR"
 mkdir -p "$OUTDIR"
 echo $MODEL > "$OUTDIR/model"
+
+echo "Executando train water simple"
 
 date >> "$OUTDIR/progress.txt"
 ./.colorize ./train.py                      \

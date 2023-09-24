@@ -1,3 +1,5 @@
+*.pkl
+
 .python-version
 .vscode/
 *.log

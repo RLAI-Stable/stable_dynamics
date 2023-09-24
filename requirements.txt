@@ -6,3 +6,4 @@ tensorflow
 tensorboardX
 scikit-learn
 sympy
+pandas
