@@ -19,7 +19,7 @@ mkdir -p "$DIRECTORY"
 rm -rf experiments/tmp
 
 
-./train_water_simple "$SAVE" &
+#./train_water_simple "$SAVE" &
 
 
 N_JOBS=1

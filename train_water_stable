@@ -30,7 +30,7 @@ date >> "$OUTDIR/progress.txt"
     --log-to "runs/$OUTDIR"                 \
     --batch-size 2000                       \
     --learning-rate "0.001"                 \
-    --epochs 5                          \
+    --epochs 20                          \
     --test-with "waterplant[test]"         \
     "waterplant[train]"                       \
     "$MODEL"                                \
