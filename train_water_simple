@@ -7,8 +7,6 @@ if SAVE=1; then
     mkdir -p experiments/tmp
 fi
 
-SEED=1906
-
 # Latent space dim:
 LSD=142
 
@@ -17,8 +15,6 @@ MODEL="simple[a=$LSD,b=512]"
 
 mkdir -p "$OUTDIR"
 echo $MODEL > "$OUTDIR/model"
-
-echo "Executando train water simple"
 
 date >> "$OUTDIR/progress.txt"
 ./.colorize ./train.py                      \

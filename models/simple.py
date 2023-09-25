@@ -7,6 +7,8 @@ from torch import nn
 
 logger = logging.getLogger(__name__)
 
+SENSOR_INDEX = 53 # PIT300
+
 global SIZE_A, SIZE_B, model
 SIZE_A = 512
 SIZE_B = 512
@@ -17,7 +19,7 @@ loss_ = nn.MSELoss()
 
 def loss(Ypred, Yactual, X):
     # TODO: Computes loss only on the first sensor
-    return loss_(Ypred[:, 0], Yactual[:, 0])
+    return loss_(Ypred[:, SENSOR_INDEX], Yactual[:, SENSOR_INDEX])
 
 def loss_flatten(l):
     return [l]

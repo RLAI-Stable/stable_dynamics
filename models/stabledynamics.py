@@ -21,6 +21,8 @@ global V_WRAP, SCALE_FX
 V_WRAP = False
 SCALE_FX = False
 
+SENSOR_INDEX = 53 # PIT300
+
 class Dynamics(nn.Module):
     def __init__(self, fhat, V, alpha=0.01):
         super().__init__()
@@ -168,7 +170,7 @@ def loss(Ypred, Yactual, X):
         Vloss = (V(succ_X) - V(X)).clamp(min=0).mean()
 
     # TODO: Compute loss only on the first sensor
-    l2loss = ((Ypred[:, 0] - Yactual[:, 0]) ** 2).mean()
+    l2loss = ((Ypred[:, SENSOR_INDEX] - Yactual[:, SENSOR_INDEX]) ** 2).mean()
     #l2loss = ((next_state_prediction(X, Ypred) - Yactual)**2).mean()
     
     return (l2loss + SMOOTH_V * Vloss, l2loss, Vloss)
