@@ -3,6 +3,8 @@ import importlib
 import logging
 import re
 
+from sympy.combinatorics import named_groups
+
 import h5py
 from torch.autograd import Variable
 

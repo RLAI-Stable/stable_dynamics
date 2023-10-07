@@ -1,0 +1,39 @@
+#!/bin/bash
+# Usage ./train_many_water_simple.sh <num_runs>
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <num_runs>"
+    exit 1
+fi
+
+
+N_RUNS="$1"
+EXP_ID="simple"
+DIRECTORY="experiments/error_${EXP_ID}"
+
+mkdir -p "$DIRECTORY"
+# Clear tmp directory
+rm -rf experiments/tmp
+
+N_JOBS=2
+
+
+mkdir experiments/tmp
+
+NUM_RAN=0
+while [ $NUM_RAN -lt $N_RUNS ]
+do
+
+    # Run N_JOBS jobs in parallel
+    for n in $(seq 1 $N_JOBS) 
+    do
+        ./train_water_simple "1"&
+        NUM_RAN=$((NUM_RAN+1))
+    done
+wait
+
+
+done
+wait
+
+

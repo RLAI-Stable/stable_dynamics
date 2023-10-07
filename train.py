@@ -51,11 +51,12 @@ def print_update(args, train_test, epoch, loss_elements):
         loss_parts = "\t".join(args.model.loss_labels())
         s = f"TIMESTAMP\tTRAIN/TEST\tepoch\t{loss_parts}"
         logger_progress.info(s)
-        print(s)
+        #print(s)
 
     now = datetime.datetime.now()
     loss_parts = "\t".join(map(str, loss_elements))
-    s = f"{now}\t{train_test}\t{epoch}\t{loss_parts}"
+    #s = f"{now}\t{train_test}\t{epoch}\t{loss_parts}"
+    s = f"{args.modeltype},{now},{train_test},{epoch},{loss_parts}"
     print(s)
     logger_progress.info(s)
 
@@ -113,6 +114,7 @@ if __name__ == "__main__":
     parser.add_argument('weights', type=str, help='save model weights')
     parser.add_argument('--log-to', type=str, help='log destination within runs/')
     parser.add_argument('--test-with', type=DynamicLoad("datasets"), default=None, help='dataset to test with instead of the training data')
+    parser.add_argument('--modeltype', type=str, help='type of the model, stable or simple')
     parser.add_argument('--batch-size', type=int, default=256, help='batch size')
     parser.add_argument('--learning-rate', type=float, default=1e-3, help='learning rate')
     parser.add_argument('--epochs', type=int, default=120, help='number of epochs to run')

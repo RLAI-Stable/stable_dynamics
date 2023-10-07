@@ -2,10 +2,10 @@
 set -e
 
 
-SAVE="$1"
-if SAVE=1; then
-    mkdir -p experiments/tmp
-fi
+# SAVE="$1"
+# if SAVE=1; then
+#     mkdir -p experiments/tmp
+# fi
 
 # Latent space dim:
 LSD=142
@@ -21,8 +21,9 @@ date >> "$OUTDIR/progress.txt"
     --log-to "runs/$OUTDIR"                 \
     --batch-size 2000                       \
     --learning-rate "0.001"                 \
-    --epochs 20                          \
+    --epochs 5                         \
     --test-with "waterplant[test]"       \
+    --modeltype "SIMPLE"                 \
     "waterplant[train]"                        \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"

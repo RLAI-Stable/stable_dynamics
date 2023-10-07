@@ -9,9 +9,9 @@ SMOOTH_V="$5"
 REHU="$6"
 DT="$7"
 SAVE="$8" # 1 to save the errors+predictions in /tmp
-if SAVE=1; then
-    mkdir -p experiments/tmp
-fi
+# if SAVE=1; then
+#     mkdir -p experiments/tmp
+# fi
 
 SEED=1906
 
@@ -30,8 +30,9 @@ date >> "$OUTDIR/progress.txt"
     --log-to "runs/$OUTDIR"                 \
     --batch-size 2000                       \
     --learning-rate "0.001"                 \
-    --epochs 20                          \
+    --epochs 25                          \
     --test-with "waterplant[test]"         \
+    --modeltype "STABLE"                    \
     "waterplant[train]"                       \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
