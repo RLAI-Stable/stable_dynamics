@@ -9,10 +9,10 @@ logger = logging.getLogger(__name__)
 
 SENSOR_INDEX = 53 # PIT300
 
-global SIZE_A, SIZE_B, model
+global SIZE_A, SIZE_B, NSTEPS, model
 SIZE_A = 512
 SIZE_B = 512
-
+NSTEPS = 10
 model = None
 
 loss_ = nn.MSELoss()
@@ -22,7 +22,7 @@ def loss(Ypred, Yactual, X):
     PREDICTS JUST BY MULTIPLYING THE INPUT BY 10
     This is just the baseline we defined for a specific experiment.
     """
-    return loss_(X[:, SENSOR_INDEX] * 10, Yactual[:, SENSOR_INDEX])
+    return loss_(X[:, SENSOR_INDEX] * NSTEPS, Yactual[:, SENSOR_INDEX])
 
 def loss_flatten(l):
     return [l]
@@ -34,12 +34,15 @@ def summary(*a, **kw):
     pass
 
 def configure(props):
-    global SIZE_A, SIZE_B, model
+    global SIZE_A, SIZE_B, NSTEPS, model
     if "a" in props:
         SIZE_A = int(props["a"])
 
     if "b" in props:
         SIZE_B = int(props["b"])
+
+    if "nsteps" in props:
+        NSTEPS = int(props["nsteps"])
 
     model = nn.Sequential(
         nn.Linear(SIZE_A, SIZE_B), nn.ReLU(),

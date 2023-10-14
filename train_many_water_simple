@@ -1,13 +1,14 @@
 #!/bin/bash
 # Usage ./train_many_water_simple.sh <num_runs>
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <num_runs>"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <num_runs> <num_steps>"
     exit 1
 fi
 
 
 N_RUNS="$1"
+NSTEPS="$2"
 EXP_ID="simple"
 DIRECTORY="experiments/error_${EXP_ID}"
 
@@ -27,7 +28,7 @@ do
     # Run N_JOBS jobs in parallel
     for n in $(seq 1 $N_JOBS) 
     do
-        ./train_water_simple "1"&
+        ./train_water_simple $NSTEPS&
         NUM_RAN=$((NUM_RAN+1))
     done
 wait

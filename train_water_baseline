@@ -1,17 +1,12 @@
 #!/bin/bash
 set -e
 
-
-# SAVE="$1"
-# if SAVE=1; then
-#     mkdir -p experiments/tmp
-# fi
-
+N="$1"
 # Latent space dim:
 LSD=142
 
 OUTDIR="experiments/water-simple/"
-MODEL="baseline[a=$LSD,b=512]"
+MODEL="baseline[a=$LSD,b=512,nsteps=$N]"
 
 mkdir -p "$OUTDIR"
 echo $MODEL > "$OUTDIR/model"
@@ -21,9 +16,9 @@ date >> "$OUTDIR/progress.txt"
     --log-to "runs/$OUTDIR"                 \
     --batch-size 2000                       \
     --learning-rate "0.001"                 \
-    --epochs 5                         \
-    --test-with "waterplant[test]"       \
-    --modeltype "BASELINE_10X"                 \
-    "waterplant[train]"                        \
+    --epochs 2                         \
+    --test-with "waterplant[test,n=$N]"       \
+    --modeltype "BASELINE_$N"                 \
+    "waterplant[train,n=$N]"                        \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"

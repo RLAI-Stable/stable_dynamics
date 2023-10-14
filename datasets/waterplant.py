@@ -12,6 +12,7 @@ N = 10
 
 def build(props):
     DATA_FILE = TEST_FILE if "test" in props else TRAIN_FILE
+    N = int(props["n"]) if "n" in props else 10
     with open(DATA_FILE, 'rb') as file:
         dataset = pickle.load(file)
 

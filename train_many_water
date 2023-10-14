@@ -1,12 +1,13 @@
 #!/bin/bash
 # Usage ./train_many_water.sh <num_runs>
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <num_runs>"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <num_runs> <num_steps>"
     exit 1
 fi
 
 N_RUNS="$1"
+NSTEPS="$2"
 EXP_ID="stable"
 DIRECTORY="experiments/error_${EXP_ID}"
 INNER="PSD-REHU"
@@ -42,7 +43,7 @@ do
                     JOBS_STARTED=0
                     while [ $JOBS_STARTED -lt $N_JOBS ] && [ $NUM_RAN -lt $N_RUNS ]
                     do
-                        ./train_water_stable "$EXP_ID" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" &
+                        ./train_water_stable "$EXP_ID" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" "$NSTEPS"&
                         NUM_RAN=$((NUM_RAN+1))
                         JOBS_STARTED=$((JOBS_STARTED+1))
                     done
