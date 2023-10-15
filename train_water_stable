@@ -10,7 +10,7 @@ REHU="$6"
 DT="$7"
 SAVE="$8" # 1 to save the errors+predictions in /tmp
 N="$9"
-LR="$10"
+LR=${10}
 
 SEED=1906
 
