@@ -22,7 +22,6 @@ mkdir -p "$DIRECTORY"
 
 #./train_water_simple "$SAVE" &
 
-
 N_JOBS=1
 for ALPHA in 0.001 #0.0001
 do
@@ -33,25 +32,28 @@ do
             for REHU in 0.005 #0.001 0.0005
             do
 
-                #mkdir experiments/tmp
-
-                NUM_RAN=0
-                while [ $NUM_RAN -lt $N_RUNS ]
+                for LR in 0.001 0.003 0.01 0.03 0.1
                 do
+                    #mkdir experiments/tmp
 
-                    # Run N_JOBS jobs in parallel
-                    JOBS_STARTED=0
-                    while [ $JOBS_STARTED -lt $N_JOBS ] && [ $NUM_RAN -lt $N_RUNS ]
+                    NUM_RAN=0
+                    while [ $NUM_RAN -lt $N_RUNS ]
                     do
-                        ./train_water_stable "$EXP_ID" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" "$NSTEPS"&
-                        NUM_RAN=$((NUM_RAN+1))
-                        JOBS_STARTED=$((JOBS_STARTED+1))
-                    done
-                    # echo waiting after $NUM_RAN
-                    wait
 
+                        # Run N_JOBS jobs in parallel
+                        JOBS_STARTED=0
+                        while [ $JOBS_STARTED -lt $N_JOBS ] && [ $NUM_RAN -lt $N_RUNS ]
+                        do
+                            ./train_water_stable "$EXP_ID" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" "$NSTEPS" "$LR"&
+                            NUM_RAN=$((NUM_RAN+1))
+                            JOBS_STARTED=$((JOBS_STARTED+1))
+                        done
+                        # echo waiting after $NUM_RAN
+                        wait
+
+                    done
+                    # echo ended running jobs in parallel for $ALPHA $INNER_EPSILON $SMOOTH_V $REHU
                 done
-                # echo ended running jobs in parallel for $ALPHA $INNER_EPSILON $SMOOTH_V $REHU
                 wait
             done
         wait

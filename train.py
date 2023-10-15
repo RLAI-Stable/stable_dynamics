@@ -56,7 +56,7 @@ def print_update(args, train_test, epoch, loss_elements):
     now = datetime.datetime.now()
     loss_parts = "\t".join(map(str, loss_elements))
     #s = f"{now}\t{train_test}\t{epoch}\t{loss_parts}"
-    s = f"{args.modeltype},{now},{train_test},{epoch},{loss_parts}"
+    s = f"{args.learning_rate},{args.modeltype},{now},{train_test},{epoch},{loss_parts}"
     print(s)
     logger_progress.info(s)
 

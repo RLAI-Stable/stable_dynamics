@@ -3,6 +3,7 @@ set -e
 
 
 N="$1"
+LR="$2"
 
 
 # Latent space dim:
@@ -18,8 +19,8 @@ date >> "$OUTDIR/progress.txt"
 ./.colorize ./train.py                      \
     --log-to "runs/$OUTDIR"                 \
     --batch-size 2000                       \
-    --learning-rate "0.001"                 \
-    --epochs 40                         \
+    --learning-rate "$LR"                 \
+    --epochs 25                         \
     --test-with "waterplant[test,n=$N]"       \
     --modeltype "SIMPLE_N_$N"                 \
     "waterplant[train,n=$N]"                        \

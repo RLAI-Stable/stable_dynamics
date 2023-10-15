@@ -22,7 +22,8 @@ def build(props):
 
         # Populate Y with the specified conditions
         for i in range(len(Y)):
-            Y[i, SENSOR_INDEX] = np.sum(dataset.iloc[i:i+N, SENSOR_INDEX])
+            # TODO: Change this to mean X_t + 1 not X_t
+            Y[i, SENSOR_INDEX] = np.sum(dataset.iloc[i+1:i+N+1, SENSOR_INDEX])
 
         X, Y = torch.tensor(X), torch.tensor(Y)
         X, Y = X.to(torch.float32), Y.to(torch.float32)

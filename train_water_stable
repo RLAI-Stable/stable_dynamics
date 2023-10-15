@@ -10,9 +10,7 @@ REHU="$6"
 DT="$7"
 SAVE="$8" # 1 to save the errors+predictions in /tmp
 N="$9"
-# if SAVE=1; then
-#     mkdir -p experiments/tmp
-# fi
+LR="$10"
 
 SEED=1906
 
@@ -30,8 +28,8 @@ date >> "$OUTDIR/progress.txt"
 ./.colorize ./train.py                      \
     --log-to "runs/$OUTDIR"                 \
     --batch-size 2000                       \
-    --learning-rate "0.001"                 \
-    --epochs 40                          \
+    --learning-rate "$LR"                 \
+    --epochs 25                          \
     --test-with "waterplant[test,n=$N]"         \
     --modeltype "STABLE_N_$N"                    \
     "waterplant[train,n=$N]"                       \

@@ -12,14 +12,9 @@ NSTEPS="$2"
 EXP_ID="simple"
 DIRECTORY="experiments/error_${EXP_ID}"
 
-mkdir -p "$DIRECTORY"
-# Clear tmp directory
-rm -rf experiments/tmp
 
 N_JOBS=2
 
-
-mkdir experiments/tmp
 
 NUM_RAN=0
 while [ $NUM_RAN -lt $N_RUNS ]
@@ -28,8 +23,11 @@ do
     # Run N_JOBS jobs in parallel
     for n in $(seq 1 $N_JOBS) 
     do
-        ./train_water_simple $NSTEPS&
-        NUM_RAN=$((NUM_RAN+1))
+        for LR in 0.001 0.003 0.01 0.03 0.1
+        do
+            ./train_water_simple $NSTEPS $LR&
+            NUM_RAN=$((NUM_RAN+1))
+        done
     done
 wait
 
