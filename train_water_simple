@@ -10,7 +10,7 @@ LR="$2"
 LSD=142
 
 OUTDIR="experiments/water-simple/"
-MODEL="simple[a=$LSD,b=4096]"
+MODEL="simple[a=$LSD,b=1024]"
 
 mkdir -p "$OUTDIR"
 echo $MODEL > "$OUTDIR/model"
