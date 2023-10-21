@@ -1,0 +1,63 @@
+#!/bin/bash
+# Usage ./train_many_water.sh <num_runs>
+
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <num_runs> <num_steps>"
+    exit 1
+fi
+
+N_RUNS="$1"
+NSTEPS="$2"
+EXP_ID="stable"
+DIRECTORY="experiments/error_${EXP_ID}"
+INNER="PSD-REHU"
+DT="1"
+SAVE="1"
+
+
+mkdir -p "$DIRECTORY"
+# Clear tmp directory
+#rm -rf experiments/tmp
+
+
+#./train_water_simple "$SAVE" &
+
+N_JOBS=1
+for ALPHA in 0.001 #0.0001
+do
+    for INNER_EPSILON in 0.01 #0.005 0.001
+    do
+        for SMOOTH_V in 0
+        do
+            for REHU in 0.005 #0.001 0.0005
+            do
+
+                for LR in 0.001 0.003 0.01 0.03 0.1 0.00005 0.0001 0.0003 0.0005
+                do
+                    #mkdir experiments/tmp
+
+                    NUM_RAN=0
+                    while [ $NUM_RAN -lt $N_RUNS ]
+                    do
+
+                        # Run N_JOBS jobs in parallel
+                        JOBS_STARTED=0
+                        while [ $JOBS_STARTED -lt $N_JOBS ] && [ $NUM_RAN -lt $N_RUNS ]
+                        do
+                            ./train_water_stable_skip "$EXP_ID" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" "$NSTEPS" "$LR"&
+                            NUM_RAN=$((NUM_RAN+1))
+                            JOBS_STARTED=$((JOBS_STARTED+1))
+                        done
+                        # echo waiting after $NUM_RAN
+                        wait
+
+                    done
+                    # echo ended running jobs in parallel for $ALPHA $INNER_EPSILON $SMOOTH_V $REHU
+                done
+                wait
+            done
+        wait
+        done
+    done
+done
+
