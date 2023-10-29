@@ -31,7 +31,7 @@ date >> "$OUTDIR/progress.txt"
     --learning-rate "$LR"                 \
     --epochs 25                          \
     --test-with "waterplantskip10[test,n=$N]"         \
-    --modeltype "STABLE_N_$N"                    \
-    "waterplant[train,n=$N]"                       \
+    --modeltype "STABLE_SKIP_N_$N"                    \
+    "waterplantskip10[train,n=$N]"                       \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"

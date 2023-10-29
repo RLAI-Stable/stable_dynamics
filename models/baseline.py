@@ -19,10 +19,9 @@ loss_ = nn.MSELoss()
 
 def loss(Ypred, Yactual, X):
     """
-    PREDICTS JUST BY MULTIPLYING THE INPUT BY 10
     This is just the baseline we defined for a specific experiment.
     """
-    return loss_(X[:, SENSOR_INDEX] * NSTEPS, Yactual[:, SENSOR_INDEX])
+    return loss_(X[:, SENSOR_INDEX], Yactual[:, SENSOR_INDEX])
 
 def loss_flatten(l):
     return [l]

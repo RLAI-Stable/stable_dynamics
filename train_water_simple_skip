@@ -1,12 +1,16 @@
 #!/bin/bash
 set -e
 
+
 N="$1"
+LR="$2"
+
+
 # Latent space dim:
 LSD=142
 
 OUTDIR="experiments/water-simple/"
-MODEL="baseline[a=$LSD,b=512,nsteps=$N]"
+MODEL="simple[a=$LSD,b=1024]"
 
 mkdir -p "$OUTDIR"
 echo $MODEL > "$OUTDIR/model"
@@ -15,10 +19,10 @@ date >> "$OUTDIR/progress.txt"
 ./.colorize ./train.py                      \
     --log-to "runs/$OUTDIR"                 \
     --batch-size 2000                       \
-    --learning-rate "0.001"                 \
-    --epochs 2                         \
-    --test-with "waterplant[test,n=$N]"       \
-    --modeltype "BASELINE_$N"                 \
-    "waterplant[train,n=$N]"                        \
+    --learning-rate "$LR"                 \
+    --epochs 25                         \
+    --test-with "waterplantskip10[test,n=$N]"       \
+    --modeltype "SIMPLE_N_$N"                 \
+    "waterplantskip10[train,n=$N]"                        \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"

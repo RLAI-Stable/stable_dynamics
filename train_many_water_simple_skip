@@ -23,9 +23,9 @@ do
     # Run N_JOBS jobs in parallel
     for n in $(seq 1 $N_JOBS) 
     do
-        for LR in 0.001 0.003 0.01 0.03 0.1 0.00005 0.0001 0.0003 0.0005
+        for LR in 0.0003 0.001 0.005 0.01 0.03 #0.001 0.003 0.01 0.03 0.1 0.00005 0.0001 0.0003 0.0005
         do
-            ./train_water_simple $NSTEPS $LR&
+            ./train_water_simple_skip $NSTEPS $LR&
             NUM_RAN=$((NUM_RAN+1))
         done
     done
