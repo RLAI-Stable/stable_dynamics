@@ -31,28 +31,29 @@ do
         do
             for REHU in 0.005 #0.001 0.0005
             do
-
-                for LR in 0.001 0.003 0.01 0.03 0.1 0.00005 0.0001 0.0003 0.0005
-                do
+                for LAYERSIZE in 100 200 300 #900 1000 #300 500 700 900 1100
+                do          
+                    for LR in 0.001 0.01 0.03 #0.001 0.003 0.01 0.03 0.1 0.00005 0.0001 0.0003 0.0005
+                    do
                     #mkdir experiments/tmp
 
-                    NUM_RAN=0
-                    while [ $NUM_RAN -lt $N_RUNS ]
-                    do
-
-                        # Run N_JOBS jobs in parallel
-                        JOBS_STARTED=0
-                        while [ $JOBS_STARTED -lt $N_JOBS ] && [ $NUM_RAN -lt $N_RUNS ]
+                        NUM_RAN=0
+                        while [ $NUM_RAN -lt $N_RUNS ]
                         do
-                            ./train_water_stable_skip "$EXP_ID" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" "$NSTEPS" "$LR"&
-                            NUM_RAN=$((NUM_RAN+1))
-                            JOBS_STARTED=$((JOBS_STARTED+1))
-                        done
-                        # echo waiting after $NUM_RAN
-                        wait
 
+                            # Run N_JOBS jobs in parallel
+                            JOBS_STARTED=0
+                            while [ $JOBS_STARTED -lt $N_JOBS ] && [ $NUM_RAN -lt $N_RUNS ]
+                            do
+                                ./train_water_stable_skip "$EXP_ID" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" "$NSTEPS" "$LR" "$LAYERSIZE"&
+                                NUM_RAN=$((NUM_RAN+1))
+                                JOBS_STARTED=$((JOBS_STARTED+1))
+                            done
+                            # echo waiting after $NUM_RAN
+                            wait
+
+                        done
                     done
-                    # echo ended running jobs in parallel for $ALPHA $INNER_EPSILON $SMOOTH_V $REHU
                 done
                 wait
             done

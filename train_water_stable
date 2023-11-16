@@ -11,6 +11,7 @@ DT="$7"
 SAVE="$8" # 1 to save the errors+predictions in /tmp
 N="$9"
 LR=${10}
+LAYERSIZE=${11}
 
 SEED=1906
 
@@ -18,7 +19,7 @@ SEED=1906
 LSD=142
 
 OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
-MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=100,h=60,rehu=$REHU,dt=$DT]"
+MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=$LAYERSIZE,h=$LAYERSIZE,rehu=$REHU,dt=$DT]"
 
 mkdir -p "$OUTDIR"
 
@@ -31,7 +32,7 @@ date >> "$OUTDIR/progress.txt"
     --learning-rate "$LR"                 \
     --epochs 60                          \
     --test-with "waterplant[test,n=$N]"         \
-    --modeltype "STABLE_N_$N"                    \
+    --modeltype "STABLE_large_N_$N"                    \
     "waterplant[train,n=$N]"                       \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"

@@ -4,13 +4,14 @@ set -e
 
 N="$1"
 LR="$2"
+LAYERSIZE="$3"
 
 
 # Latent space dim:
 LSD=142
 
 OUTDIR="experiments/water-simple/"
-MODEL="simple[a=$LSD,b=1024]"
+MODEL="simple[a=$LSD,b=$LAYERSIZE]"
 
 mkdir -p "$OUTDIR"
 echo $MODEL > "$OUTDIR/model"
@@ -22,7 +23,7 @@ date >> "$OUTDIR/progress.txt"
     --learning-rate "$LR"                 \
     --epochs 60                         \
     --test-with "waterplant[test,n=$N]"       \
-    --modeltype "SIMPLE_N_$N"                 \
+    --modeltype "SIMPLE_$LAYERSIZE-N_$N"                 \
     "waterplant[train,n=$N]"                        \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
