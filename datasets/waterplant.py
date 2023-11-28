@@ -26,7 +26,7 @@ def build(props):
             Y[i, SENSOR_INDEX] = np.sum(dataset.iloc[i+1:i+N+1, SENSOR_INDEX])
 
         X, Y = torch.tensor(X), torch.tensor(Y)
-        X, Y = X.to(torch.float32), Y.to(torch.float32)
+        X, Y = X.to(torch.float64), Y.to(torch.float64)
 
         rv = torch.utils.data.TensorDataset(X, Y)
         return rv

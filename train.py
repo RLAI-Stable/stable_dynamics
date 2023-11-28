@@ -20,6 +20,7 @@ from torchvision.utils import save_image
 from util import DynamicLoad, setup_logging, to_variable
 
 logger = setup_logging(os.path.basename(__file__))
+torch.set_default_dtype(torch.float64)
 
 def runbatch(args, model, loss, batch):
     X, Yactual = batch

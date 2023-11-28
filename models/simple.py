@@ -31,6 +31,7 @@ def summary(*a, **kw):
     pass
 
 def configure(props):
+    torch.set_default_dtype(torch.float64)
     global SIZE_A, SIZE_B, model
     if "a" in props:
         SIZE_A = int(props["a"])

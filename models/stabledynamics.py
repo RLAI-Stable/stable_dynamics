@@ -196,6 +196,7 @@ def summary(*a, **kw):
     pass
 
 def configure(props):
+    torch.set_default_dtype(torch.float64)
     logger.info(props)
     lsd = int(props["latent_space_dim"])
     logger.info(f"Set latent space dimenson to {lsd}")
