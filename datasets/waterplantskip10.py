@@ -16,8 +16,8 @@ def build(props):
         dataset = pickle.load(file)
 
         # Extract X and Y
-        X = 10 * np.array(dataset.iloc[:-N])  # excluding the last N rows (N-step)
-        Y = 10 * np.array(dataset.iloc[N:])
+        X = np.array(dataset.iloc[:-N])  # excluding the last N rows (N-step)
+        Y = np.array(dataset.iloc[N:])
 
         X, Y = torch.tensor(X), torch.tensor(Y)
         X, Y = X.to(torch.float64), Y.to(torch.float64)
