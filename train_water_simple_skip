@@ -5,12 +5,13 @@ set -e
 N="$1"
 LR="$2"
 LAYERSIZE="$3"
+JOBID="$4"
 
 
 # Latent space dim:
 LSD=142
 
-OUTDIR="experiments/water-simple/"
+OUTDIR="experiments/water-simple-skip/skip_${N}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/$JOBID"
 MODEL="simple[a=$LSD,b=$LAYERSIZE]"
 
 mkdir -p "$OUTDIR"
@@ -26,4 +27,4 @@ date >> "$OUTDIR/progress.txt"
     --modeltype "SIMPLE_$LAYERSIZE-SKIP_N_$N"                 \
     "waterplantskip10[train,n=$N]"                        \
     "$MODEL"                                \
-    "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
+    "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"S

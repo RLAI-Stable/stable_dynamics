@@ -1,14 +1,15 @@
-#!/bin/bash
+ #!/bin/bash
 # Usage ./train_many_water_simple.sh <num_runs>
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <num_runs> <num_steps>"
+if [ "$#" -ne 3 ]; then
+    echo "Usage: $0 <num_runs> <num_steps> <JOB_ID>"
     exit 1
 fi
 
 
 N_RUNS="$1"
 NSTEPS="$2"
+JOB_ID="$3"
 EXP_ID="simple"
 DIRECTORY="experiments/error_${EXP_ID}"
 
@@ -27,7 +28,7 @@ do
         do
             for LAYERSIZE in 300 #900 1000 #300 500 700 900 1000 1100 
             do
-                ./train_water_simple_skip $NSTEPS $LR $LAYERSIZE&
+                ./train_water_simple_skip $NSTEPS $LR $LAYERSIZE $JOB_ID&
                 NUM_RAN=$((NUM_RAN+1))
             done
         done

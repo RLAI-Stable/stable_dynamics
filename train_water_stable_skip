@@ -12,13 +12,14 @@ SAVE="$8" # 1 to save the errors+predictions in /tmp
 N="$9"
 LR=${10}
 LAYERSIZE=${11}
+JOBID=${12}
 
 SEED=1906
 
 # Latent space dim:
 LSD=142
 
-OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
+OUTDIR="experiments/water-${EXP_ID}-skip/skip_${N}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/$JOBID"
 MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=$LAYERSIZE,h=$LAYERSIZE,rehu=$REHU,dt=$DT]"
 
 mkdir -p "$OUTDIR"
