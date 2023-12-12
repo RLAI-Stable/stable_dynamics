@@ -19,7 +19,7 @@ loss_ = nn.MSELoss()
 
 def loss(Ypred, Yactual, X):
     # TODO: Computes loss only on the first sensor
-    return loss_(Ypred[:, SENSOR_INDEX], Yactual[:, SENSOR_INDEX])
+    return loss_(Ypred[:, :], Yactual[:, :]) # TODO: clean this code up
 
 def loss_flatten(l):
     return [l]

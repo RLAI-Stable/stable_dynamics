@@ -17,8 +17,8 @@ date >> "$OUTDIR/progress.txt"
     --batch-size 2000                       \
     --learning-rate "0.001"                 \
     --epochs 2                         \
-    --test-with "waterplantskip10[test,n=$N]"       \
+    --test-with "waterplantskip[test,n=$N]"       \
     --modeltype "BASELINE_SKIP_$N"                 \
-    "waterplantskip10[train,n=$N]"                        \
+    "waterplantskip[train,n=$N]"                        \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
