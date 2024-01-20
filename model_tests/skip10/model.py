@@ -5,6 +5,7 @@ from typing import Any, Mapping
 import torch
 import torch.nn.functional as F
 from torch import nn
+from . import pendulum_energy
 
 logger = logging.getLogger(__file__)
 
@@ -243,6 +244,8 @@ def configure(props):
                     nn.Linear(lsd, ph_dim,), nn.ReLU(),
                     nn.Linear(ph_dim, ph_dim), nn.ReLU(),
                     nn.Linear(ph_dim, 1))
+        elif props["projfn"] == "ActualPendulumEnergy":
+            V = pendulum_energy.pendulum_energy(n=pendulum_n)
         else:
             logger.error(f"Projected function {props['projfn']} does not exist")
 
