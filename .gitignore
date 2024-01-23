@@ -15,3 +15,5 @@ runs/
 test.ipynb
 
 *.mp4
+
+*env/*
