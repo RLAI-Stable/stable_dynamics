@@ -10,18 +10,9 @@ N_RUNS="$1"
 NSTEPS="$2"
 JOB_ID="$3"
 EXP_ID="stable"
-DIRECTORY="experiments/error_${EXP_ID}"
 INNER="PSD-REHU"
 DT="1"
 SAVE="1"
-
-
-mkdir -p "$DIRECTORY"
-# Clear tmp directory
-#rm -rf experiments/tmp
-
-
-#./train_water_simple "$SAVE" &
 
 N_JOBS=1
 for ALPHA in 0.001 #0.0001
@@ -46,7 +37,7 @@ do
                             JOBS_STARTED=0
                             while [ $JOBS_STARTED -lt $N_JOBS ] && [ $NUM_RAN -lt $N_RUNS ]
                             do
-                                ./train_water_stable_skip "$EXP_ID" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" "$NSTEPS" "$LR" "$LAYERSIZE" "$JOB_ID"&
+                                ./train_water_stable "$EXP_ID" "$ALPHA" "$INNER" "$INNER_EPSILON" "$SMOOTH_V" "$REHU" "$DT" "$SAVE" "$NSTEPS" "$LR" "$LAYERSIZE" &
                                 NUM_RAN=$((NUM_RAN+1))
                                 JOBS_STARTED=$((JOBS_STARTED+1))
                             done

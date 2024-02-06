@@ -8,6 +8,7 @@ import random
 import sys
 from collections import defaultdict
 from pathlib import Path
+import pickle
 
 import numpy as np
 import torch
@@ -16,7 +17,6 @@ from tensorboardX import SummaryWriter
 from torch import nn, optim
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
-from torchvision.utils import save_image
 from util import DynamicLoad, setup_logging, to_variable
 
 logger = setup_logging(os.path.basename(__file__))
@@ -42,24 +42,19 @@ def test_model(args, model, test_dataloader, epoch=None, summarywriter=None):
 
     return sum(loss_parts) / len(test_dataloader.dataset)
 
-global _first_printed
-_first_printed = False
-def print_update(args, train_test, epoch, loss_elements):
-    logger_progress = logger.getChild("progress")
-    global _first_printed
-    if not _first_printed:
-        _first_printed = True
-        loss_parts = "\t".join(args.model.loss_labels())
-        s = f"TIMESTAMP\tTRAIN/TEST\tepoch\t{loss_parts}"
-        logger_progress.info(s)
-        #print(s)
-
+def build_loss_log(args, train_test, epoch, loss_elements):
     now = datetime.datetime.now()
-    loss_parts = "\t".join(map(str, loss_elements))
-    #s = f"{now}\t{train_test}\t{epoch}\t{loss_parts}"
-    s = f"{args.learning_rate},{args.modeltype},{now},{train_test},{epoch},{loss_parts}"
-    print(s)
-    logger_progress.info(s)
+
+    loss_row = {
+        "timestamp": now,
+        "learning_rate": args.learning_rate,
+        "model_type": args.modeltype,
+        "train_or_test": train_test,
+        "epoch": epoch,
+        "loss": loss_elements[0],
+    }
+
+    return loss_row
 
 def main(args):
     writer = SummaryWriter(logdir=args.log_to)
@@ -72,13 +67,13 @@ def main(args):
     else:
         test_dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
-    # TODO: Flag to disable CUDA
     if torch.cuda.is_available():
         model.cuda()
 
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
 
     # TODO: Resume training support
+    loss_list = []
     for epoch in range(1, args.epochs + 1):
         model.train()
         loss_parts = []
@@ -91,18 +86,18 @@ def main(args):
             optim_loss.backward()
             optimizer.step()
 
-        epoch_loss = sum(loss_parts) / len(dataset)
-        print_update(args, "TRAIN", epoch, epoch_loss)
-        for lbl, val in zip(args.model.loss_labels(), epoch_loss):
-            writer.add_scalar(f'train_loss/{lbl}', val, epoch)
+        losses_in_epoch = sum(loss_parts) / len(dataset)
+        loss_list.append(build_loss_log(args, "TRAIN", epoch, losses_in_epoch))
 
         if epoch % args.save_every == 0 or epoch == args.epochs:
             torch.save(model.state_dict(), args.weights.format(epoch=epoch))
             test_loss = test_model(args, model, test_dataloader, epoch=epoch, summarywriter=writer)
-            print_update(args, "TEST", epoch, test_loss)
-            for lbl, val in zip(args.model.loss_labels(), test_loss):
-                writer.add_scalar(f'test_loss/{lbl}', val, epoch)
+            loss_list.append(build_loss_log(args, "TEST", epoch, test_loss))
 
+    
+    with open(args.error_path, 'wb') as f:
+        pickle.dump(loss_list, f)
+        
     # Ensure the writer is completed.
     writer.close()
 
@@ -120,6 +115,8 @@ if __name__ == "__main__":
     parser.add_argument('--learning-rate', type=float, default=1e-3, help='learning rate')
     parser.add_argument('--epochs', type=int, default=120, help='number of epochs to run')
     parser.add_argument('--save-every', type=int, default=5, help='save after this many epochs')
+    parser.add_argument('--error-path', type=str, help='path to save the evaluation errors of the model')
+
     parser.set_defaults(func=main)
 
     try:

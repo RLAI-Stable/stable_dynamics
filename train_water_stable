@@ -1,0 +1,48 @@
+#!/bin/bash
+set -e
+
+EXP_ID="$1"
+ALPHA="$2"
+INNER="$3"
+INNER_EPSILON="$4"
+SMOOTH_V="$5"
+REHU="$6"
+DT="$7"
+SAVE="$8" # 1 to save the errors+predictions in /tmp
+N="$9"
+LR=${10}
+LAYERSIZE=${11}
+UUID=$(uuidgen)
+
+
+NUM_EPOCHS=2
+SEED=1906
+
+# Latent space dim:
+LSD=142
+
+OUTDIR="experiments/water-${EXP_ID}-skip/skip_${N}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/$UUID"
+MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=$LAYERSIZE,h=$LAYERSIZE,rehu=$REHU,dt=$DT]"
+
+mkdir -p "$OUTDIR"
+
+echo $MODEL >"$OUTDIR/model"
+
+date >>"$OUTDIR/progress.txt"
+./.colorize ./train.py \
+    --log-to "runs/$OUTDIR" \
+    --batch-size 2000 \
+    --learning-rate "$LR" \
+    --epochs $NUM_EPOCHS \
+    --test-with "waterplantskip[test,n=$N]" \
+    --modeltype "STABLE_$LAYERSIZE-SKIP_N_$N" \
+    --error-path "$OUTDIR/epoch_losses.pkl" \
+    "waterplantskip[train,n=$N]" \
+    "$MODEL" \
+    "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
+
+./.colorize ./rollout_eval.py \
+    --save-to "$OUTDIR/rollout_eval.pkl" \
+    "$MODEL" \
+    "$OUTDIR/checkpoint_*.pth" \
+    1000 | tee -a "$OUTDIR/eval.txt"
