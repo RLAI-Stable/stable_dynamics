@@ -14,8 +14,7 @@ LR=${10}
 LAYERSIZE=${11}
 UUID=$(uuidgen)
 
-
-NUM_EPOCHS=2
+NUM_EPOCHS=40
 SEED=1906
 
 # Latent space dim:
@@ -42,7 +41,9 @@ date >>"$OUTDIR/progress.txt"
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
 
 ./.colorize ./rollout_eval.py \
+    --skip $N \
     --save-to "$OUTDIR/rollout_eval.pkl" \
+    --save-image-to "$OUTDIR/rollout_plot.png" \
     "$MODEL" \
     "$OUTDIR/checkpoint_*.pth" \
     1000 | tee -a "$OUTDIR/eval.txt"
