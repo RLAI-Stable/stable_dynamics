@@ -114,7 +114,7 @@ if __name__ == "__main__":
     parser.add_argument('--batch-size', type=int, default=256, help='batch size')
     parser.add_argument('--learning-rate', type=float, default=1e-3, help='learning rate')
     parser.add_argument('--epochs', type=int, default=120, help='number of epochs to run')
-    parser.add_argument('--save-every', type=int, default=5, help='save after this many epochs')
+    parser.add_argument('--save-every', type=int, default=10, help='save after this many epochs')
     parser.add_argument('--error-path', type=str, help='path to save the evaluation errors of the model')
 
     parser.set_defaults(func=main)
