@@ -14,7 +14,7 @@ LR=${10}
 LAYERSIZE=${11}
 UUID=$(uuidgen)
 
-NUM_EPOCHS=45
+NUM_EPOCHS=60
 SEED=1906
 
 # Latent space dim:
