@@ -1,0 +1,42 @@
+ #!/bin/bash
+# Usage ./train_many_water_simple.sh <num_runs>
+
+if [ "$#" -ne 3 ]; then
+    echo "Usage: $0 <num_runs> <num_steps> <JOB_ID>"
+    exit 1
+fi
+
+
+N_RUNS="$1"
+NSTEPS="$2"
+JOB_ID="$3"
+EXP_ID="simple"
+DIRECTORY="experiments/error_${EXP_ID}"
+
+
+N_JOBS=2
+
+
+NUM_RAN=0
+while [ $NUM_RAN -lt $N_RUNS ]
+do
+
+    # Run N_JOBS jobs in parallel
+    for n in $(seq 1 $N_JOBS) 
+    do
+        for LR in 0.0003 #0.001 0.01 0.03 #  0.001 0.003 0.01 0.03 0.1 0.00005 0.0001 0.0003 0.0005
+        do
+            for LAYERSIZE in 300 #900 1000 #300 500 700 900 1000 1100 
+            do
+                ./train_water_simple $NSTEPS $LR $LAYERSIZE $JOB_ID&
+                NUM_RAN=$((NUM_RAN+1))
+            done
+        done
+    done
+wait
+
+
+done
+wait
+
+
