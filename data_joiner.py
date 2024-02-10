@@ -9,7 +9,7 @@ def read_pickle_file(file_path):
     return data
 
 def save_to_csv(data, csv_file):
-    outdir = "aggregated_experiments_{:%d_%m_%Y-%H:%M:%S}".format(datetime.now())
+    outdir = "aggregated_experiments/experiment_{:%d_%m_%Y-%H:%M:%S}".format(datetime.now())
     os.makedirs(outdir, exist_ok=True)
 
     path = os.path.join(outdir, csv_file)
