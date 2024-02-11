@@ -34,6 +34,6 @@ date >>"$OUTDIR/progress.txt"
     --skip $N \
     --save-to "$OUTDIR/rollout_eval.pkl" \
     --save-image-to "$OUTDIR/rollout_plot.png" \
-    --rollout-steps 1000 \
+    --rollout-steps 2000 \
     --model "$MODEL" \
     --weights "$OUTDIR/checkpoint_*.pth" | tee -a "$OUTDIR/eval.txt"
