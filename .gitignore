@@ -16,4 +16,6 @@ test.ipynb
 
 *.mp4
 
-*env/*
+*env/
+*_Store*
+.*
