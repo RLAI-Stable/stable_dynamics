@@ -32,6 +32,7 @@ def main(args):
     total_error = 0
     predicted_rollout = [starting_PIT300]
     true_rollout = [starting_PIT300]
+    cumulative_error = [0]
     for i in range(1, args.rollout_steps):
         current_step = predict_next_step(model, current_step)
 
@@ -41,11 +42,12 @@ def main(args):
         predicted_rollout.append(current_PIT300)
         true_rollout.append(true_PIT300)
 
-        total_error += calculate_prediction_error(current_PIT300, true_PIT300)
+        current_error = calculate_prediction_error(current_PIT300, true_PIT300)
+        cumulative_error.append(current_error + cumulative_error[-1])
 
-    avg_error = total_error / args.rollout_steps
-    save_error(args.save_to, total_error, avg_error)
-    save_rollout(args.save_image_to, predicted_rollout, true_rollout, total_error)
+    save_error(args.save_to, cumulative_error)
+    save_rollout_plots(args.save_image_to, predicted_rollout, true_rollout, total_error)
+    save_rollout_error_plot(args.save_error_plot_to, cumulative_error)
 
 
 def predict_next_step(model, X_nn):
@@ -59,27 +61,38 @@ def calculate_prediction_error(model_prediction, true_data):
     return abs(true_data - model_prediction)
 
 def load_water_data():
-    cache_path = Path("sensor-cache") / f"test_nov22_no_trace.pkl"
+    cache_path = f"test_nov22_no_trace.pkl"
     with open(cache_path, 'rb') as f:
         data = pickle.load(f)
     return data
 
+"""
+Returns the first step of the trajectory
+"""
 def get_starting_point(data):
     start = to_variable(torch.tensor(np.array(data.iloc[0:1])), cuda=torch.cuda.is_available())
     return start
 
-def save_error(path, total_error, avg_error):
+"""
+Saves the numerical total_error and avg_error to a file
+"""
+def save_error(path, cumulative_error):
+    total_error = cumulative_error[-1]
+    avg_error = total_error / len(cumulative_error)
     rollout_error = {"rollout_error": total_error, "avg_error": avg_error}
     print(rollout_error)
     with open(path, 'wb') as f:
         pickle.dump(rollout_error, f)
 
-def save_rollout(path, predicted_rollout, true_rollout, total_error):
+"""
+Plots the real rollout against the predicted rollout
+"""
+def save_rollout_plots(path, predicted_rollout, true_rollout, total_error):
     plt.figure(figsize=(12, 4))
 
     plt.subplot(1, 2, 1)
     plt.plot(predicted_rollout, label='Model predictions')
-    plt.title('Model Predictions (Skip 20, stable)')
+    plt.title('Model Predictions (Skip 20, stable)') # TODO: make this adaptable to a SKIP parameter, for now we always assume that we are running SKIP 20 to simplify the code
               
     plt.subplot(1, 2, 2)
     plt.plot(true_rollout, label='PIT300')
@@ -89,12 +102,24 @@ def save_rollout(path, predicted_rollout, true_rollout, total_error):
 
     # Show the plots
     plt.savefig(path)
+    plt.close()
 
+
+"""
+Plots the (cumulative) rollout error per timestep
+"""
+def save_rollout_error_plot(path, cumulative_error):
+    plt.figure(figsize=(12, 4))
+    plt.title("Error over the rollout")
+    plt.plot(cumulative_error, label="Cumulative error")
+    plt.savefig(path)
+    plt.close()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Error of .')
     parser.add_argument('--skip', type=int, default=20, help="Downscaling of the rollout of data")
     parser.add_argument('--save-to', type=str, help="Destination of the file containing evaluation loss")
+    parser.add_argument('--save-error-plot-to', type=str, help="Destination of the file containing the cumulative rollout error plot")
     parser.add_argument('--save-image-to', type=str, help="Destination of the file containing the predicted rollout plot")
     parser.add_argument('--rollout-steps', type=int, help="number of steps to evaluate over")
     parser.add_argument('--model', type=DynamicLoad("models"), help='model to load')

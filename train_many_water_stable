@@ -15,9 +15,9 @@ DT="1"
 SAVE="1"
 
 N_JOBS=1
-for ALPHA in 0.001 0.0001
+for ALPHA in 0.001 #0.0001
 do
-    for INNER_EPSILON in 0.01 0.005 0.001
+    for INNER_EPSILON in 0.01 #0.005 0.001
     do
         for SMOOTH_V in 0
         do
@@ -25,7 +25,7 @@ do
             do
                 for LAYERSIZE in 300 #100 200 300 #900 1000 #300 500 700 900 1100
                 do          
-                    for LR in 0.0003 0.001 0.01 0.03 #0.001 0.003 0.01 0.03 0.1 0.00005 0.0001 0.0003 0.0005
+                    for LR in 0.0003 #0.001 0.01 0.03 #0.001 0.003 0.01 0.03 0.1 0.00005 0.0001 0.0003 0.0005
                     do
                     #mkdir experiments/tmp
 

@@ -9,7 +9,7 @@ JOBID="$4"
 # Latent space dim:
 LSD=142
 UUID=$(uuidgen)
-NUM_EPOCHS=60
+NUM_EPOCHS=40
 
 OUTDIR="experiments/water-simple-skip/skip_${N}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/$UUID"
 MODEL="simple[a=$LSD,b=$LAYERSIZE]"
@@ -34,6 +34,7 @@ date >>"$OUTDIR/progress.txt"
     --skip $N \
     --save-to "$OUTDIR/rollout_eval.pkl" \
     --save-image-to "$OUTDIR/rollout_plot.png" \
+    --save-error-plot-to "$OUTDIR/rollout_error_plot.png" \
     --rollout-steps 2000 \
     --model "$MODEL" \
     --weights "$OUTDIR/checkpoint_*.pth" | tee -a "$OUTDIR/eval.txt"
