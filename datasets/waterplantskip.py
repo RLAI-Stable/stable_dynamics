@@ -1,27 +1,22 @@
 from pathlib import Path
 
 import numpy as np
-import pickle
 import torch
+import pandas as pd
 
-TRAIN_FILE = Path("train_nov22_no_trace.pkl")
-TEST_FILE = Path("test_nov22_no_trace.pkl")
 
 def build(props):
-    DATA_FILE = TEST_FILE if "test" in props else TRAIN_FILE
-    N = 1 # int(props["n"]) if "n" in props else 1 # Current simply predicts the next step
-    with open(DATA_FILE, 'rb') as file:
-        dataset = pickle.load(file)
+    print(props)
+    DATA_FILE = Path(props["dataset"])
+    N = int(props["n"])  # This should come from props again
+    dataset = pd.read_pickle(DATA_FILE)
 
-        # Extract X and Y
-        X = np.array(dataset.iloc[:-N])  # excluding the last N rows (N-step)
-        Y = np.array(dataset.iloc[N:])
+    # Extract X and Y
+    X = np.array(dataset.iloc[:-N])  # excluding the last N rows (N-step)
+    Y = np.array(dataset.iloc[N:])
 
-        X, Y = torch.tensor(X), torch.tensor(Y)
-        X, Y = X.to(torch.float64), Y.to(torch.float64)
+    X, Y = torch.Tensor(X), torch.Tensor(Y)
+    X, Y = X.to(torch.float64), Y.to(torch.float64)
 
-        rv = torch.utils.data.TensorDataset(X, Y)
-        return rv
-    
-if __name__ == "__main__":
-    build([])
+    rv = torch.utils.data.TensorDataset(X, Y)
+    return rv

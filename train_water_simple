@@ -15,7 +15,7 @@ OUTDIR="experiments/water-simple-skip/skip_${N}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/
 MODEL="simple[a=$LSD,b=$LAYERSIZE]"
 
 mkdir -p "$OUTDIR"
-echo $MODEL >"$OUTDIR/model"
+echo "$MODEL" >"$OUTDIR/model"
 
 date >>"$OUTDIR/progress.txt"
 ./.colorize ./train.py \
@@ -31,7 +31,7 @@ date >>"$OUTDIR/progress.txt"
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
 
 ./.colorize ./rollout_eval.py \
-    --skip $N \
+    --skip "$N" \
     --save-to "$OUTDIR/rollout_eval.pkl" \
     --save-image-to "$OUTDIR/rollout_plot.png" \
     --save-error-plot-to "$OUTDIR/rollout_error_plot.png" \
