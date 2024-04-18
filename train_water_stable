@@ -17,7 +17,7 @@ TEST_DATASET=${13}
 ROLLOUT_DATASET=${14}
 UUID=$(uuidgen)
 
-NUM_EPOCHS=40
+NUM_EPOCHS=80
 
 OUTDIR="experiments/water-${EXP_ID}-skip/skip_${SKIP}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/$UUID"
 MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=$LAYERSIZE,h=$LAYERSIZE,rehu=$REHU,dt=$DT]"
