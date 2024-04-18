@@ -107,7 +107,6 @@ for run in range(N_RUNS):
                                                     test_dataset,  # For now we use test as the rollout dataset
                                                 )
                                             )
-                                    os.chmod(SCRIPT_FILE, 0o755)  # chmod +x
-
-                                    # Increment the file index
-                                    FILE_INDEX += 1
+                                        os.chmod(SCRIPT_FILE, 0o755)  # chmod +x
+                                        # Increment the file index
+                                        FILE_INDEX += 1
