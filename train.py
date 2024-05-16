@@ -105,6 +105,7 @@ def main(args):
             test_loss = test_model(
                 args, model, test_dataloader, epoch=epoch, summarywriter=writer
             )
+            print("Loss:", test_loss[0], "Epoch:", epoch)
             loss_list.append(build_loss_log(args, "TEST", epoch, test_loss))
 
     with open(args.error_path, "wb") as f:

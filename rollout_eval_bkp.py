@@ -12,7 +12,7 @@ from util import DynamicLoad, latest_file, setup_logging, to_variable
 from pathlib import Path
 import matplotlib.pyplot as plt
 
-Y_COLUMN = "Xt"
+PIT300_COLUMN = "ZW_PIT300.DATA"
 
 logger = setup_logging(os.path.basename(__file__))
 
@@ -24,24 +24,24 @@ def main(args):
     if torch.cuda.is_available():
         model.cuda()
 
-    all_sensors_data = load_sine_data(args.rollout_dataset)
-    Y_index = all_sensors_data.columns.get_loc(Y_COLUMN)
-    Y_data = all_sensors_data[Y_COLUMN]
+    all_sensors_data = load_water_data(args.rollout_dataset)
+    PIT300_index = all_sensors_data.columns.get_loc(PIT300_COLUMN)
+    PIT300_data = all_sensors_data[PIT300_COLUMN]
 
     current_step = get_starting_point(all_sensors_data)
-    starting_Y = current_step[0][Y_index].item()
+    starting_PIT300 = current_step[0][PIT300_index].item()
 
     total_error = 0
-    predicted_rollout = [starting_Y]
-    true_rollout = [starting_Y]
+    predicted_rollout = [starting_PIT300]
+    true_rollout = [starting_PIT300]
     cumulative_error = [0]
-    for i in range(1, min(args.rollout_steps, len(Y_data))):
+    for i in range(1, args.rollout_steps):
         current_step = predict_next_step(model, current_step)
 
-        current_PIT300 = current_step[0][Y_index].cpu().numpy()
+        current_PIT300 = current_step[0][PIT300_index].cpu().numpy()
         if i * args.skip > len(all_sensors_data):
             break
-        true_PIT300 = Y_data[i * args.skip]
+        true_PIT300 = PIT300_data[i * args.skip]
 
         predicted_rollout.append(current_PIT300)
         true_rollout.append(true_PIT300)
@@ -69,10 +69,9 @@ def calculate_prediction_error(model_prediction, true_data):
     return abs(true_data - model_prediction)
 
 
-def load_sine_data(rollout_dataset):
+def load_water_data(rollout_dataset):
     # TODO: Maybe think about loading multiple datasets?
     data = pd.read_pickle(rollout_dataset)
-    data.reset_index(drop=True, inplace=True)
     return data
 
 
@@ -116,8 +115,8 @@ def save_rollout_plots(path, predicted_rollout, true_rollout, total_error, skip=
     )  # TODO: make this adaptable to a SKIP parameter, for now we always assume that we are running SKIP 20 to simplify the code
 
     plt.subplot(1, 2, 2)
-    plt.plot(true_rollout, label="Sine")
-    plt.title("Sine - Test Set")
+    plt.plot(true_rollout, label="PIT300")
+    plt.title("PIT300 - Test Set")
 
     plt.tight_layout()
 

@@ -1,17 +1,20 @@
 #!/bin/bash
 set -e
 
-N="$1"
+SKIP="$1"
 LR="$2"
 LAYERSIZE="$3"
-JOBID="$4"
+
+TRAIN_DATASET="./sine_data/train_sine.pkl" # Make it dynamic later on
+TEST_DATASET="./sine_data/test_sine.pkl"
+ROLLOUT_DATASET="./sine_data/test_sine.pkl"
 
 # Latent space dim:
-LSD=142
+LSD=2 # TODO: this can be changed, the second output (Xt-1) is not needed... For now we can keep it
 UUID=$(uuidgen)
-NUM_EPOCHS=40
+NUM_EPOCHS=80
 
-OUTDIR="experiments/water-simple-skip/skip_${N}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/$UUID"
+OUTDIR="sine/simple/experiments/skip_${SKIP}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/$UUID"
 MODEL="simple[a=$LSD,b=$LAYERSIZE]"
 
 mkdir -p "$OUTDIR"
@@ -20,21 +23,23 @@ echo "$MODEL" >"$OUTDIR/model"
 date >>"$OUTDIR/progress.txt"
 ./.colorize ./train.py \
     --log-to "runs/$OUTDIR" \
-    --batch-size 2000 \
+    --batch-size 64 \
     --learning-rate "$LR" \
     --epochs $NUM_EPOCHS \
-    --test-with "waterplantskip[test,n=$N]" \
-    --modeltype "SIMPLE_$LAYERSIZE-SKIP_N_$N" \
+    --train-with "sine[dataset=$TRAIN_DATASET,n=$SKIP]" \
+    --test-with "sine[dataset=$TEST_DATASET,n=$SKIP]" \
+    --modeltype "SIMPLE_$LAYERSIZE-SKIP_N_$SKIP" \
     --error-path "$OUTDIR/epoch_losses.pkl" \
-    "waterplantskip[train,n=$N]" \
+    --save-every 15 \
     "$MODEL" \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
 
 ./.colorize ./rollout_eval.py \
-    --skip "$N" \
+    --skip "$SKIP" \
     --save-to "$OUTDIR/rollout_eval.pkl" \
     --save-image-to "$OUTDIR/rollout_plot.png" \
     --save-error-plot-to "$OUTDIR/rollout_error_plot.png" \
-    --rollout-steps 2000 \
+    --rollout-steps 1000 \
     --model "$MODEL" \
+    --rollout-dataset "$ROLLOUT_DATASET" \
     --weights "$OUTDIR/checkpoint_*.pth" | tee -a "$OUTDIR/eval.txt"

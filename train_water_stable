@@ -19,7 +19,7 @@ UUID=$(uuidgen)
 
 NUM_EPOCHS=80
 
-OUTDIR="experiments/water-${EXP_ID}-skip/skip_${SKIP}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/$UUID"
+OUTDIR="sine/experiments/water-${EXP_ID}-skip/skip_${SKIP}_LR_${LR}_LAYERSIZE_${LAYERSIZE}/$UUID"
 MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=$LAYERSIZE,h=$LAYERSIZE,rehu=$REHU,dt=$DT]"
 
 mkdir -p "$OUTDIR"
@@ -29,11 +29,11 @@ echo "$MODEL" >"$OUTDIR/model"
 date >>"$OUTDIR/progress.txt"
 ./.colorize ./train.py \
     --log-to "runs/$OUTDIR" \
-    --batch-size 2000 \
+    --batch-size 32 \
     --learning-rate "$LR" \
     --epochs $NUM_EPOCHS \
-    --train-with "waterplantskip[dataset=$TRAIN_DATASET,n=$SKIP]" \
-    --test-with "waterplantskip[dataset=$TEST_DATASET,n=$SKIP]" \
+    --train-with "sine[dataset=$TRAIN_DATASET,n=$SKIP]" \
+    --test-with "sine[dataset=$TEST_DATASET,n=$SKIP]" \
     --modeltype "STABLE_$LAYERSIZE-SKIP_N_$SKIP" \
     --error-path "$OUTDIR/epoch_losses.pkl" \
     --save-every 15 \
@@ -45,10 +45,10 @@ date >>"$OUTDIR/progress.txt"
     --save-to "$OUTDIR/rollout_eval.pkl" \
     --save-image-to "$OUTDIR/rollout_plot.png" \
     --save-error-plot-to "$OUTDIR/rollout_error_plot.png" \
-    --rollout-steps 2000 \
+    --rollout-steps 100 \
     --model "$MODEL" \
     --rollout-dataset "$ROLLOUT_DATASET" \
     --weights "$OUTDIR/checkpoint_*.pth" | tee -a "$OUTDIR/eval.txt"
 
 
-    # Gotta add all stuff here, including dataset
+# TODO: increase rollout steps to 1000
