@@ -150,6 +150,21 @@ class NextStateGenerator(nn.Module):
         return self.dt*self.network(x)
         #return x + self.dt*self.network(x)
 
+"""
+Defines a constant energy function to represent the energy of
+a sine wave, similar to that of an undamped harmonic oscillator.
+
+V(sin(t)) = 1/2 (sin'(t)**2 + sin(t)**2)
+V(sin(t)) = 1/2 (cos(t)**2 + sin(t)**2)
+V(sin(t)) = 1/2 (sqrt(1 - sin(t) ** 2) + sin(t) ** 2)
+
+Define x = sin(t)
+V(x) = 1/2 (sqrt(1 - x**2) + x**2)
+"""
+
+def sine_energy(X):
+    return 1/2 * (math.sqrt(1 - math.pow(X, 2)) + math.pow(X, 2))
+
 
 def loss(Ypred, Yactual, X):
     # Force smoothness in V:
@@ -233,7 +248,6 @@ def configure(props):
                     nn.Linear(ph_dim, ph_dim), nn.ReLU(),
                     nn.Linear(ph_dim, 1), ReHU(float(props["rehu"]) if "rehu" in props else 0.01))
             V = MakePSD(seq, lsd, eps=projfn_eps, d=1.0)
-
         elif props["projfn"] == "EndPSICNN":
             V = nn.Sequential(nn.Linear(lsd, ph_dim, bias=False), nn.LeakyReLU(),
                 nn.Linear(ph_dim, lsd, bias=False), nn.LeakyReLU(),
@@ -243,6 +257,8 @@ def configure(props):
                     nn.Linear(lsd, ph_dim,), nn.ReLU(),
                     nn.Linear(ph_dim, ph_dim), nn.ReLU(),
                     nn.Linear(ph_dim, 1))
+        elif props["projfn"] == "Sine":
+            pass
         else:
             logger.error(f"Projected function {props['projfn']} does not exist")
 
