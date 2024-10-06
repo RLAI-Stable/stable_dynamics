@@ -6,6 +6,8 @@ youtube
 experiments/
 pendulum-cache/
 runs/
+simple_pendulum_data/
+.venv/*
 
 **/__pycache__/
 .ipynb_checkpoints

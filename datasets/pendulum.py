@@ -11,6 +11,7 @@ CACHE = Path("pendulum-cache/")
 
 # Modified from: http://jakevdp.github.io/blog/2017/03/08/triple-pendulum-chaos/
 def pendulum_gradient(n, lengths=None, masses=1, friction=0.3):
+    friction = 0 # Experimenting with no damping
     """Integrate a multi-pendulum with `n` sections"""
     #-------------------------------------------------
     # Step 1: construct the pendulum model
@@ -149,7 +150,7 @@ def build(props):
     # Number of joints in the pendulum:
     n = int(props["n"]) if "n" in props else 1
     test = "test" if "test" in props else "train"
-    lowenergy =  "lowenergy" in props
+    lowenergy = False # We are avoiding low energy now
 
     pen_gen = pendulum_gradient(n)
     le_str = "-lowenergy" if lowenergy else ""

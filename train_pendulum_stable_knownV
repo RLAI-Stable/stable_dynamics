@@ -3,8 +3,9 @@ set -e
 
 EXP_ID="$1"
 N="$2"
-ALPHA="$3"
-INNER="ActualPendulumEnergy"
+ALPHA=0
+# INNER="ActualPendulumEnergy"
+INNER="PSD-REHU"
 INNER_EPSILON="$5"
 SMOOTH_V="$6"
 REHU="$7"
@@ -23,13 +24,14 @@ date >> "$OUTDIR/progress.txt"
     --log-to "runs/$OUTDIR"                 \
     --batch-size 2000                       \
     --learning-rate "0.005"                 \
-    --epochs 1000                           \
+    --epochs 200                            \
     --test-with "pendulum[n=$N,test]"       \
     "pendulum[n=$N]"                        \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_{epoch:0>5}.pth" | tee -a "$OUTDIR/progress.txt"
 
 ./.colorize ./pendulum_error.py             \
+    --number 100                            \
     pendulum[n=$N,test]                     \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_*.pth"              \

@@ -42,7 +42,7 @@ def main(args):
         logger.info(f"Generating trajectories for {cache_path}")
         # Initialize args.number initial positions:
         X_init = np.zeros((args.number, 2 * n)).astype(np.float32)
-        X_init[:,:] = (np.random.rand(args.number, 2*n).astype(np.float32) - 0.5) * np.pi/4 # Pick values in range [-pi/8, pi/8] radians, radians/sec
+        X_init[:,:] = (np.random.rand(args.number, 2*n).astype(np.float32) - 0.5) * np.pi # Pick values in range [-pi/8, pi/8] radians, radians/sec
 
         X_phy = np.zeros((args.steps, *X_init.shape), dtype=np.float32)
         X_phy[0,...] = X_init
@@ -77,27 +77,38 @@ def main(args):
         X_nn = X_nn + 1/6*(k1 + 2*k2 + 2*k3 + k4)
         X_nn = X_nn.detach()
 
-        logger.info(f"Timestep {i}")
         y = X_nn.cpu().numpy()
         # TODO: Update error calculation
         vel_error = np.sum((X_phy[i,:,n:] - y[:,n:])**2)
-        ang_error = (X_phy[i,:,:n] - y[:,:n])
-        while np.any(ang_error >= np.pi):
-            ang_error[ang_error >= np.pi] -= 2*np.pi
-        while np.any(ang_error < -np.pi):
-            ang_error[ang_error < -np.pi] += 2*np.pi
+        ang_error = (X_phy[i,:,:n] - y[:,:n]).astype('float64')
+        ang_error = scaleAngErr(ang_error)
 
         ang_error = np.sum(ang_error**2)
+
         errors[i] = (vel_error + ang_error)
 
     for i in range(args.steps):
-        print(f"{i}\t{np.sum(errors[0:i])}\t{errors[i]}")
+        if i % 100 == 0:
+            print(f"Step {i}  |  Cum. error: {np.sum(errors[0:i])}  |  Error: {errors[i]}")
+
+def scaleAngErr(ang_error):
+    # Scales errors to the range [0, 2pi)
+    mod = ang_error//(2*np.pi)
+    ang_error -= mod*2*np.pi
+    # assert all([np.all(ang_error <= 2*np.pi), np.all(ang_error >= 0)]), f"Angles not in range [0, 2pi]: {ang_error[ang_error > 2*np.pi], ang_error[ang_error < 0]}"
+
+    # Then moves them to the range (-pi, pi]
+    if np.any(ang_error > np.pi):
+        ang_error[ang_error > np.pi] -= 2*np.pi
+    assert all([np.all(ang_error <= np.pi), np.all(ang_error >= -np.pi)]), f"Angles not in range [-pi, pi]: {ang_error[ang_error > np.pi], ang_error[ang_error < -np.pi]}"
+
+    return ang_error
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Error of .')
     parser.add_argument('--number', type=int, default=1000, help="number of starting positions to evaluate from")
-    parser.add_argument('--timestep', type=float, default=0.01, help="duration of each timestep")
+    parser.add_argument('--timestep', type=float, default=0.1, help="duration of each timestep")
 
     parser.add_argument('data', type=DynamicLoad("datasets"), help='the pendulum dataset to load the simulator from')
     parser.add_argument('model', type=DynamicLoad("models"), help='model to load')
