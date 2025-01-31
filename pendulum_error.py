@@ -16,8 +16,9 @@ from models import pendulum_energy
 
 from pathlib import Path
 
-logger = setup_logging(os.path.basename(__file__))
+from datetime import datetime
 
+logger = setup_logging(os.path.basename(__file__))
 
 def main(args):
     model = args.model.model
@@ -33,7 +34,11 @@ def main(args):
 
     logger.info(f"Loaded physics simulator for {n}-link pendulum")
 
+    now = datetime.now()
+    dt_string = now.strftime("%d-%m-%Y|%H:%M:%S")
+
     cache_path = Path("pendulum-cache") / f"p-physics-{n}.npy"
+    predictions_path = Path("pendulum-cache") / f"prediction-{n}-{dt_string}.npy"
 
     # Energy functions
     energy = pendulum_energy.pendulum_energy(n)
@@ -64,6 +69,10 @@ def main(args):
 
     X_nn = to_variable(torch.tensor(X_phy[0,:,:]), cuda=torch.cuda.is_available())
     errors = np.zeros((args.steps,))
+
+
+    # Variable holding all our predictions to be saved
+    X_pred = np.zeros((args.steps, *X_nn.shape)) 
     for i in range(1, args.steps):
         X_nn.requires_grad = True
         k1 = h * model(X_nn)
@@ -78,6 +87,10 @@ def main(args):
         X_nn = X_nn.detach()
 
         y = X_nn.cpu().numpy()
+
+        # Variable to save all our predictions
+        X_pred[i,...] = y
+
         # TODO: Update error calculation
         vel_error = np.sum((X_phy[i,:,n:] - y[:,n:])**2)
         ang_error = (X_phy[i,:,:n] - y[:,:n]).astype('float64')
@@ -90,6 +103,9 @@ def main(args):
     for i in range(args.steps):
         if i % 100 == 0:
             print(f"Step {i}  |  Cum. error: {np.sum(errors[0:i])}  |  Error: {errors[i]}")
+
+    np.save(predictions_path, X_pred)
+
 
 def scaleAngErr(ang_error):
     # Scales errors to the range [0, 2pi)

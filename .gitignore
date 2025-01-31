@@ -11,3 +11,7 @@ simple_pendulum_data/
 
 **/__pycache__/
 .ipynb_checkpoints
+.idea/
+*.pth
+*.npz
+*.npy

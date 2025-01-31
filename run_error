@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+UUID="020C14C4-8277-4C70-A498-CC6F511891A9"
+
+EXP_ID="stable"
+N="1"
+ALPHA="0.000"
+INNER="PSD-REHU"
+INNER_EPSILON="0.001"
+SMOOTH_V="0"
+REHU="0.001"
+
+# Latent space dim:
+LSD=$(( 2 * N ))
+
+OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}/$UUID"
+OUTDIR_CENTRAL="experiments/pendulum-${EXP_ID}/${N}-central"
+
+MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=32,h=32,rehu=$REHU]"
+
+./.colorize ./pendulum_error.py             \
+    pendulum[n=$N,test]                     \
+    "$MODEL"                                \
+    "$OUTDIR/checkpoint_*.pth"              \
+    1000

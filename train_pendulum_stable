@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Generate a UUID
+UUID=$(uuidgen)
+
 EXP_ID="$1"
 N="$2"
 ALPHA="$3"
@@ -8,22 +11,27 @@ INNER="$4"
 INNER_EPSILON="$5"
 SMOOTH_V="$6"
 REHU="$7"
+LR="$8"
 
 # Latent space dim:
 LSD=$(( 2 * N ))
 
-OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}"
-MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=60,h=100,rehu=$REHU]"
+OUTDIR="experiments/pendulum-${EXP_ID}/${N}_${ALPHA}_${INNER}_${INNER_EPSILON}_${SMOOTH_V}_${REHU}/$UUID"
+OUTDIR_CENTRAL="experiments/pendulum-${EXP_ID}/${N}-central"
+
+MODEL="stabledynamics[latent_space_dim=$LSD,a=$ALPHA,projfn=$INNER,projfn_eps=$INNER_EPSILON,smooth_v=$SMOOTH_V,hp=32,h=32,rehu=$REHU]"
 
 mkdir -p "$OUTDIR"
+mkdir -p "$OUTDIR_CENTRAL"
+
 echo $MODEL > "$OUTDIR/model"
 
 date >> "$OUTDIR/progress.txt"
 ./.colorize ./train.py                      \
     --log-to "runs/$OUTDIR"                 \
-    --batch-size 2000                       \
-    --learning-rate "0.001"                 \
-    --epochs 1000                           \
+    --batch-size 256                       \
+    --learning-rate "$LR"                   \
+    --epochs 2000                           \
     --test-with "pendulum[n=$N,test]"       \
     "pendulum[n=$N]"                        \
     "$MODEL"                                \
@@ -33,4 +41,4 @@ date >> "$OUTDIR/progress.txt"
     pendulum[n=$N,test]                     \
     "$MODEL"                                \
     "$OUTDIR/checkpoint_*.pth"              \
-    1000 | tee -a "$OUTDIR/eval.txt"
+    1000 | sed -e 's/\x1b\[[0-9;]*[a-zA-Z]//g' |  tee -a "$OUTDIR/eval.txt" | awk -v uuid="$UUID" '{print uuid","$0}' | tee -a "$OUTDIR_CENTRAL/central_eval.txt"
