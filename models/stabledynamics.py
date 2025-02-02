@@ -25,28 +25,28 @@ class Dynamics(nn.Module):
         super().__init__()
         self.fhat = fhat
         self.V = V
-        self.alpha = 0 # alpha
+        self.alpha = alpha
 
-        def forward(self, x):
-            fx = self.fhat(x)
-            if SCALE_FX:
-                fx = fx / fx.norm(p=2, dim=1, keepdim=True).clamp(min=1.0)
+    def forward(self, x):
+        fx = self.fhat(x)
+        if SCALE_FX:
+            fx = fx / fx.norm(p=2, dim=1, keepdim=True).clamp(min=1.0)
 
-            Vx = self.V(x)
-            gV = torch.autograd.grad([a for a in Vx], [x], create_graph=True, only_inputs=True)[0]
-            rv = fx - gV * (F.relu((gV*fx).sum(dim=1) + self.alpha*Vx[:,0])/(gV**2).sum(dim=1))[:,None]
+        Vx = self.V(x)
+        gV = torch.autograd.grad([a for a in Vx], [x], create_graph=True, only_inputs=True)[0]
+        rv = fx - gV * (F.relu((gV*fx).sum(dim=1) + self.alpha*Vx[:,0])/(gV**2).sum(dim=1))[:,None]
 
-            if VERIFY:
-                # Verify that rv has no positive component along gV.
-                # This helps us catch:
-                #   (1) numeric error in the symbolic gradient calculation, and
-                #   (2) Violation of the Lyapunov function when Euler integration is used.
-                verify = (gV * rv).sum(dim=1)
-                num_violation = len([v for v in verify if v > 0]) # (1)
-                new_V = self.V(x + V_SCALE * rv)
-                if (new_V > Vx).any(): # (2)
-                    err = sorted([v for v in (new_V - Vx).detach().cpu().numpy().ravel() if v > 0], reverse=True)
-                    logger.warn(f"V increased by: {err[:min(5, len(err))]} (total {len(err)}; upward grad {num_violation});")
+        if VERIFY:
+            # Verify that rv has no positive component along gV.
+            # This helps us catch:
+            #   (1) numeric error in the symbolic gradient calculation, and
+            #   (2) Violation of the Lyapunov function when Euler integration is used.
+            verify = (gV * rv).sum(dim=1)
+            num_violation = len([v for v in verify if v > 0]) # (1)
+            new_V = self.V(x + V_SCALE * rv)
+            if (new_V > Vx).any(): # (2)
+                err = sorted([v for v in (new_V - Vx).detach().cpu().numpy().ravel() if v > 0], reverse=True)
+                logger.warn(f"V increased by: {err[:min(5, len(err))]} (total {len(err)}; upward grad {num_violation});")
 
             return rv
 
